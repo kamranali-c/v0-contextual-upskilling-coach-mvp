@@ -260,7 +260,7 @@ function CoachDetail({
 
 // --- Main popup ---
 export function AssistantPopup() {
-  const [open, setOpen] = useState(true)
+  const [open, setOpen] = useState(false)
   const [minimized, setMinimized] = useState(false)
   const [selectedSuggestion, setSelectedSuggestion] = useState<Suggestion | null>(null)
   const [plan, setPlan] = useState<CoachingPlan | null>(null)
@@ -315,9 +315,10 @@ export function AssistantPopup() {
     return (
       <button
         onClick={() => setOpen(true)}
-        className="fixed bottom-6 right-6 z-50 w-12 h-12 rounded-full bg-accent text-accent-foreground flex items-center justify-center shadow-lg shadow-accent/20 hover:scale-105 transition-transform"
+        className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-accent text-accent-foreground flex items-center justify-center shadow-lg shadow-accent/30 hover:scale-110 hover:shadow-xl hover:shadow-accent/40 transition-all duration-200 cursor-pointer"
+        aria-label="Open Upskilling Coach"
       >
-        <Sparkles className="w-5 h-5" />
+        <span className="text-xl font-bold leading-none">?</span>
       </button>
     )
   }

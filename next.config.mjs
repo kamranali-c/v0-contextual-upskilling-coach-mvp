@@ -1,3 +1,10 @@
+import { createRequire } from "module"
+import { dirname, join } from "path"
+
+const require = createRequire(import.meta.url)
+const nextPkgDir = dirname(require.resolve("next/package.json"))
+const projectRoot = join(nextPkgDir, "../..")
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   typescript: {
@@ -7,7 +14,7 @@ const nextConfig = {
     unoptimized: true,
   },
   turbopack: {
-    root: process.cwd(),
+    root: projectRoot,
   },
 }
 
