@@ -5,6 +5,7 @@ import {
   Sparkles,
   X,
   Minus,
+  Maximize2,
   ChevronRight,
   BookOpen,
   Shield,
@@ -354,12 +355,14 @@ export function AssistantPopup() {
           <button
             onClick={() => setMinimized(!minimized)}
             className="w-6 h-6 rounded flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
+            title={minimized ? "Expand" : "Minimize"}
           >
-            <Minus className="w-3.5 h-3.5" />
+            {minimized ? <Maximize2 className="w-3.5 h-3.5" /> : <Minus className="w-3.5 h-3.5" />}
           </button>
           <button
             onClick={() => setOpen(false)}
             className="w-6 h-6 rounded flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
+            title="Close"
           >
             <X className="w-3.5 h-3.5" />
           </button>
