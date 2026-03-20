@@ -150,6 +150,8 @@ export default function DemoPage() {
         onOpenChange={setShowCoach}
         trigger={currentTriggerData}
         onComplete={handleCoachComplete}
+        recentActions={activityEvents.slice(0, 5).map((e) => e.action)}
+        retryCount={retryCount}
       />
     </AppShell>
   )
