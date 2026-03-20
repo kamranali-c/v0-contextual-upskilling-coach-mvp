@@ -1,10 +1,5 @@
-import { xai } from "@ai-sdk/xai"
+// ── Grok model via Vercel AI Gateway ────────────────────────────────
+// AI SDK 6 uses model strings directly through the AI Gateway.
+// xAI/Grok requires AI_GATEWAY_API_KEY to be set.
 
-// ── Server-only xAI helpers ─────────────────────────────────────────────────
-// This file must only be imported in server contexts (API routes, server actions).
-
-export function getGrokModel() {
-  return xai("grok-4", {
-    apiKey: process.env.XAI_API_KEY,
-  })
-}
+export const GROK_MODEL = "xai/grok-3-mini-fast" as const

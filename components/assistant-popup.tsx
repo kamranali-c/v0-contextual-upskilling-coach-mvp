@@ -4,7 +4,6 @@ import { useState } from "react"
 import {
   X,
   Minus,
-  ChevronRight,
   BookOpen,
   Compass,
   Target,
@@ -14,22 +13,24 @@ import {
   Sparkles,
   ExternalLink,
   Loader2,
+  Eye,
 } from "lucide-react"
 
-// --- "?" FAB button ---
-function CoachFab({ onClick }: { onClick: () => void }) {
+/* ------------------------------------------------------------------ */
+/*  Context source pill — shows what Grok is reading                  */
+/* ------------------------------------------------------------------ */
+function SourcePill({ label }: { label: string }) {
   return (
-    <button
-      onClick={onClick}
-      className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-emerald-500 text-white flex items-center justify-center shadow-lg shadow-emerald-500/30 hover:shadow-xl hover:shadow-emerald-500/40 hover:scale-105 transition-all duration-200 cursor-pointer group"
-      aria-label="Open AI Coach"
-    >
-      <span className="text-xl font-bold leading-none group-hover:scale-110 transition-transform">?</span>
-    </button>
+    <span className="inline-flex items-center gap-1 text-[10px] font-medium text-emerald-300 bg-emerald-500/10 border border-emerald-500/15 px-2 py-0.5 rounded-full">
+      <Eye className="w-2.5 h-2.5" />
+      {label}
+    </span>
   )
 }
 
-// --- Section wrapper ---
+/* ------------------------------------------------------------------ */
+/*  Section header                                                    */
+/* ------------------------------------------------------------------ */
 function Section({
   icon: Icon,
   title,
@@ -65,7 +66,9 @@ function Section({
   )
 }
 
-// --- Internal doc card ---
+/* ------------------------------------------------------------------ */
+/*  Internal doc card                                                 */
+/* ------------------------------------------------------------------ */
 function DocCard({ title, subtitle }: { title: string; subtitle: string }) {
   return (
     <div className="flex items-center gap-3 rounded-lg border border-white/[0.06] bg-white/[0.02] px-3 py-2.5 hover:bg-white/[0.05] hover:border-white/[0.1] transition-all cursor-pointer group">
@@ -81,9 +84,26 @@ function DocCard({ title, subtitle }: { title: string; subtitle: string }) {
   )
 }
 
-// --- Main popup ---
+/* ------------------------------------------------------------------ */
+/*  "?" FAB                                                           */
+/* ------------------------------------------------------------------ */
+function CoachFab({ onClick }: { onClick: () => void }) {
+  return (
+    <button
+      onClick={onClick}
+      className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-emerald-500 text-white flex items-center justify-center shadow-lg shadow-emerald-500/30 hover:shadow-xl hover:shadow-emerald-500/40 hover:scale-105 transition-all duration-200 cursor-pointer group"
+      aria-label="Open AI Coach"
+    >
+      <span className="text-xl font-bold leading-none group-hover:scale-110 transition-transform">?</span>
+    </button>
+  )
+}
+
+/* ------------------------------------------------------------------ */
+/*  Main popup — starts open to immediately show the concept          */
+/* ------------------------------------------------------------------ */
 export function AssistantPopup() {
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState(true)
   const [minimized, setMinimized] = useState(false)
   const [askingGrok, setAskingGrok] = useState(false)
   const [grokAnswer, setGrokAnswer] = useState<string | null>(null)
@@ -117,9 +137,14 @@ export function AssistantPopup() {
       })
       if (!res.ok) throw new Error("Failed")
       const data = await res.json()
-      setGrokAnswer(data.plan?.whyNow || "Grok analyzed your current task and confirmed the suggestions above are aligned with your work context and team roadmap.")
+      setGrokAnswer(
+        data.plan?.whyNow ||
+        "Based on your schema design and migration patterns, this database setup aligns with the Q3 platform foundations roadmap. Completing connection pooling and shadow database configuration will strengthen your service reliability maturity."
+      )
     } catch {
-      setGrokAnswer("This task strengthens your backend engineering capability and directly supports the Q3 platform roadmap goals around service persistence and production readiness.")
+      setGrokAnswer(
+        "Based on your schema design and migration patterns, this database setup aligns with the Q3 platform foundations roadmap. Completing connection pooling and shadow database configuration will strengthen your service reliability maturity."
+      )
     } finally {
       setAskingGrok(false)
     }
@@ -134,28 +159,28 @@ export function AssistantPopup() {
       className="fixed bottom-6 right-6 z-50 flex flex-col rounded-2xl border border-white/[0.08] overflow-hidden transition-all duration-300"
       style={{
         width: minimized ? 340 : 420,
-        height: minimized ? 56 : 640,
+        height: minimized ? 56 : "min(680px, calc(100vh - 48px))",
         backgroundColor: "#0c1018",
-        boxShadow: "0 25px 60px -12px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.05)",
+        boxShadow: "0 25px 80px -12px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.05), 0 0 40px -10px rgba(16,185,129,0.08)",
       }}
     >
-      {/* Header */}
+      {/* ---- Header ---- */}
       <div className="flex items-center gap-3 px-4 py-3 border-b border-white/[0.06] shrink-0">
         <div className="w-8 h-8 rounded-xl bg-emerald-500/15 border border-emerald-500/20 flex items-center justify-center">
           <Sparkles className="w-4 h-4 text-emerald-400" />
         </div>
         <div className="flex-1 min-w-0">
-          <h3 className="text-sm font-semibold text-white/90 tracking-tight">AI Coach</h3>
+          <div className="flex items-center gap-2">
+            <h3 className="text-sm font-semibold text-white/90 tracking-tight">Grok Coach</h3>
+            <span className="text-[9px] font-mono text-emerald-400/60 bg-emerald-500/8 border border-emerald-500/10 rounded px-1.5 py-0.5">
+              live
+            </span>
+          </div>
           {!minimized && (
-            <p className="text-[10px] text-white/35 mt-0.5 font-medium">
-              Roadmap-aware suggestions
+            <p className="text-[10px] text-white/30 mt-0.5">
+              Reading your workspace context
             </p>
           )}
-        </div>
-        <div className="flex items-center gap-2 mr-1">
-          <span className="text-[9px] font-mono text-white/20 bg-white/[0.04] border border-white/[0.06] rounded px-1.5 py-0.5">
-            Grok
-          </span>
         </div>
         <div className="flex items-center gap-0.5">
           <button
@@ -173,19 +198,33 @@ export function AssistantPopup() {
         </div>
       </div>
 
-      {/* Body */}
+      {/* ---- Body ---- */}
       {!minimized && (
         <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-5 min-h-0">
 
-          {/* Section 1: What Grok thinks you're doing */}
+          {/* Context sources banner */}
+          <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-3">
+            <p className="text-[10px] font-semibold uppercase tracking-widest text-white/30 mb-2">
+              Grok is reading from
+            </p>
+            <div className="flex flex-wrap gap-1.5">
+              <SourcePill label="schema.prisma" />
+              <SourcePill label="db.ts" />
+              <SourcePill label=".env.local" />
+              <SourcePill label="terminal output" />
+              <SourcePill label="Q3 roadmap" />
+            </div>
+          </div>
+
+          {/* Section 1: What you're doing */}
           <Section icon={Compass} title="Current Context" accentColor="emerald">
             <div className="rounded-xl border border-emerald-500/10 bg-emerald-500/[0.04] p-3.5">
               <p className="text-[13px] font-medium text-white/85 leading-snug">
-                You're setting up persistence for a backend service
+                Setting up PostgreSQL persistence with Prisma
               </p>
               <p className="text-xs text-white/45 leading-relaxed mt-1.5">
-                This task involves database configuration with Prisma, schema design with relational models,
-                migration management, and deployment setup for a PostgreSQL-backed API.
+                You have a working schema with User and Post models, migrations are running successfully,
+                but connection pooling is missing and SHADOW_DATABASE_URL is not configured.
               </p>
             </div>
           </Section>
@@ -193,10 +232,10 @@ export function AssistantPopup() {
           {/* Section 2: Roadmap alignment */}
           <Section icon={Target} title="Roadmap Alignment" accentColor="sky">
             <p className="text-xs text-white/55 leading-relaxed">
-              This work supports the roadmap themes of{" "}
-              <span className="text-sky-400/90 font-medium">Platform Foundations</span>,{" "}
-              <span className="text-sky-400/90 font-medium">Application Persistence</span>, and{" "}
-              <span className="text-sky-400/90 font-medium">Service Reliability</span>.
+              Matches{" "}
+              <span className="text-sky-400/90 font-medium">Platform Foundations</span> and{" "}
+              <span className="text-sky-400/90 font-medium">Service Reliability</span>{" "}
+              from the Q3 engineering roadmap.
             </p>
             <div className="flex flex-wrap gap-1.5 mt-2">
               {["Platform Foundations", "Backend Maturity", "Production Readiness"].map((tag) => (
@@ -214,14 +253,11 @@ export function AssistantPopup() {
           <Section icon={BookOpen} title="What to Learn Next" accentColor="emerald">
             <div className="flex flex-col gap-1.5">
               {[
-                "Relational database fundamentals",
-                "Schema design and normalization",
-                "Migration strategies and rollback plans",
-                "Connection pooling (PgBouncer)",
-                "Indexing and query optimization",
-                "Transactions and data integrity",
-                "Observability for database-backed services",
-                "Serverless deployment considerations",
+                "Connection pooling with PgBouncer for serverless",
+                "Shadow databases for safe migration testing",
+                "Indexing strategies for your User/Post models",
+                "Transaction patterns for data integrity",
+                "Query monitoring and observability",
               ].map((item, i) => (
                 <div key={i} className="flex items-start gap-2.5 py-1">
                   <span className="text-[10px] font-mono text-emerald-400/60 mt-0.5 w-4 text-right shrink-0">
@@ -233,40 +269,32 @@ export function AssistantPopup() {
             </div>
           </Section>
 
-          {/* Section 4: Suggested internal docs */}
+          {/* Section 4: Internal docs */}
           <Section icon={FileText} title="Internal Resources" accentColor="violet">
             <div className="flex flex-col gap-1.5">
-              <DocCard title="Q3 Platform Roadmap" subtitle="Engineering strategy / roadmap" />
+              <DocCard title="Q3 Platform Roadmap" subtitle="Engineering strategy" />
               <DocCard title="Database Standards" subtitle="Backend / standards" />
-              <DocCard title="Service Persistence Patterns" subtitle="Architecture / patterns" />
               <DocCard title="Migration Playbook" subtitle="Engineering / runbooks" />
-              <DocCard title="Backend Reliability Checklist" subtitle="SRE / checklists" />
             </div>
           </Section>
 
-          {/* Section 5: Growth / skill mapping */}
+          {/* Section 5: Growth mapping */}
           <Section icon={TrendingUp} title="Growth Mapping" accentColor="amber">
-            <div className="flex flex-col gap-2">
-              <p className="text-xs text-white/55 leading-relaxed">
-                This task strengthens <span className="text-amber-400/90 font-medium">backend engineering</span> capability
-                and also supports growth in <span className="text-amber-400/90 font-medium">platform engineering</span> and{" "}
-                <span className="text-amber-400/90 font-medium">production engineering</span>.
-              </p>
-              <p className="text-xs text-white/40 leading-relaxed">
-                Relevant for progression toward stronger systems design, delivery ownership, and infrastructure fluency.
-              </p>
-            </div>
+            <p className="text-xs text-white/55 leading-relaxed">
+              Strengthens <span className="text-amber-400/90 font-medium">backend engineering</span> and{" "}
+              <span className="text-amber-400/90 font-medium">platform engineering</span> capability.
+              Relevant for progression toward systems design and infrastructure fluency.
+            </p>
           </Section>
 
-          {/* Section 6: Suggested next actions */}
+          {/* Section 6: Actions */}
           <Section icon={CheckSquare} title="Suggested Actions" accentColor="rose">
             <div className="flex flex-col gap-1.5">
               {[
-                "Review migration strategy before deploying",
                 "Configure connection pooling for serverless",
-                "Read the persistence standards doc",
-                "Add monitoring for query latency and errors",
-                "Validate rollback plan for schema changes",
+                "Set up SHADOW_DATABASE_URL",
+                "Read the database standards doc",
+                "Add query latency monitoring",
               ].map((action, i) => (
                 <div
                   key={i}
@@ -279,7 +307,7 @@ export function AssistantPopup() {
             </div>
           </Section>
 
-          {/* Grok answer (if asked) */}
+          {/* Grok answer */}
           {grokAnswer && (
             <div className="rounded-xl border border-emerald-500/15 bg-emerald-500/[0.05] p-3.5">
               <div className="flex items-center gap-2 mb-2">
@@ -292,25 +320,13 @@ export function AssistantPopup() {
         </div>
       )}
 
-      {/* Footer */}
+      {/* ---- Footer ---- */}
       {!minimized && (
-        <div className="px-4 py-3 border-t border-white/[0.06] shrink-0 flex flex-wrap items-center gap-2">
-          <button className="text-[11px] font-medium text-violet-400 hover:text-violet-300 bg-violet-500/8 hover:bg-violet-500/15 border border-violet-500/10 px-2.5 py-1.5 rounded-lg transition-all flex items-center gap-1.5">
-            <FileText className="w-3 h-3" />
-            Open roadmap
-          </button>
-          <button className="text-[11px] font-medium text-sky-400 hover:text-sky-300 bg-sky-500/8 hover:bg-sky-500/15 border border-sky-500/10 px-2.5 py-1.5 rounded-lg transition-all flex items-center gap-1.5">
-            <BookOpen className="w-3 h-3" />
-            Save plan
-          </button>
-          <button className="text-[11px] font-medium text-amber-400 hover:text-amber-300 bg-amber-500/8 hover:bg-amber-500/15 border border-amber-500/10 px-2.5 py-1.5 rounded-lg transition-all flex items-center gap-1.5">
-            <TrendingUp className="w-3 h-3" />
-            Skill path
-          </button>
+        <div className="px-4 py-3 border-t border-white/[0.06] shrink-0 flex items-center gap-2">
           <button
             onClick={handleAskGrok}
             disabled={askingGrok}
-            className="text-[11px] font-medium text-emerald-400 hover:text-emerald-300 bg-emerald-500/8 hover:bg-emerald-500/15 border border-emerald-500/10 px-2.5 py-1.5 rounded-lg transition-all flex items-center gap-1.5 disabled:opacity-50"
+            className="text-[11px] font-medium text-emerald-400 hover:text-emerald-300 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/15 px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 disabled:opacity-50"
           >
             {askingGrok ? (
               <Loader2 className="w-3 h-3 animate-spin" />
@@ -318,6 +334,10 @@ export function AssistantPopup() {
               <Sparkles className="w-3 h-3" />
             )}
             Ask Grok why
+          </button>
+          <button className="text-[11px] font-medium text-violet-400 hover:text-violet-300 bg-violet-500/8 hover:bg-violet-500/15 border border-violet-500/10 px-2.5 py-1.5 rounded-lg transition-all flex items-center gap-1.5">
+            <FileText className="w-3 h-3" />
+            Open roadmap
           </button>
           <div className="flex-1" />
           <button
