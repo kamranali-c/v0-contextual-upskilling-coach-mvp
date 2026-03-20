@@ -1,13 +1,19 @@
 import { z } from "zod"
 
 // ── Coaching Plan Output Schema ──────────────────────────────────────────────
-// Structured output from Grok. Every field is required (nullable where needed)
-// so it works with strict mode in AI SDK 6.
+// Structured output from Grok. Richer response with videos, docs, roadmap, skills.
 
 export const coachingPlanSchema = z.object({
   title: z.string().describe("Short, specific coaching title tied to the user's current task"),
-  whyNow: z.string().describe("1-2 sentence explanation of why this suggestion is relevant right now"),
-  quickExplanation: z.string().describe("2-3 sentence overview of the learning plan"),
+
+  // 1. Context summary
+  contextSummary: z.string().describe("1-2 sentence summary of what FlowState thinks the user is currently doing, based on the task and recent actions"),
+
+  // 2. Why this matters now
+  whyNow: z.string().describe("2-3 sentence explanation of why this topic is important right now in the user's workflow. Be specific and tie it to business impact."),
+
+  // 3. Recommended learning path
+  quickExplanation: z.string().describe("2-3 sentence overview of the learning path"),
   steps: z
     .array(
       z.object({
@@ -17,17 +23,65 @@ export const coachingPlanSchema = z.object({
       })
     )
     .min(2)
-    .max(4)
-    .describe("2-4 actionable learning steps"),
+    .max(5)
+    .describe("2-5 actionable learning steps forming a recommended learning path"),
+
+  // 4. YouTube videos to watch
+  videos: z
+    .array(
+      z.object({
+        title: z.string().describe("Video title"),
+        channel: z.string().describe("YouTube channel or creator name"),
+        reason: z.string().describe("Short reason why this video is relevant to the current task"),
+        duration: z.string().describe("Estimated duration like '12 min' or '8 min'"),
+        difficulty: z.enum(["Beginner", "Intermediate", "Advanced"]).describe("Difficulty level"),
+      })
+    )
+    .min(3)
+    .max(5)
+    .describe("3-5 curated YouTube video recommendations relevant to the task"),
+
+  // 5. Docs to read
+  docs: z
+    .array(
+      z.object({
+        title: z.string().describe("Document or article title"),
+        source: z.string().describe("Source like 'PostgreSQL Docs', 'Supabase Guide', etc."),
+        summary: z.string().describe("1 sentence summary of what the doc covers"),
+        reason: z.string().describe("Short reason why this doc matters for the current task"),
+      })
+    )
+    .min(3)
+    .max(5)
+    .describe("3-5 documentation resources relevant to the task"),
+
+  // 6. Practice task
   practiceTask: z.object({
     title: z.string(),
     instruction: z.string(),
-  }).describe("One small practice exercise the user can do immediately"),
-  deeperResource: z.object({
-    title: z.string(),
-    description: z.string(),
-    optional: z.boolean(),
-  }).describe("One optional resource for deeper learning"),
+    secondaryTasks: z.array(z.string()).min(1).max(3).describe("1-3 additional practice suggestions"),
+  }).describe("Hands-on practice exercises the user can try immediately"),
+
+  // 7. Roadmap alignment
+  roadmapTags: z
+    .array(z.string())
+    .min(3)
+    .max(6)
+    .describe("3-6 roadmap or business goal tags this task aligns with, e.g. 'Platform Foundations', 'Security Hardening', 'Production Readiness'"),
+
+  // 8. Skill growth mapping
+  skillAreas: z
+    .array(
+      z.object({
+        name: z.string().describe("Skill area name like 'Backend Engineering' or 'Database Design'"),
+        relevance: z.enum(["Primary", "Supporting"]).describe("Whether this is a primary or supporting skill for this task"),
+      })
+    )
+    .min(3)
+    .max(6)
+    .describe("3-6 capability areas this work develops"),
+
+  // Meta
   estimatedMinutes: z.number().describe("Estimated duration in minutes"),
   relevanceLabel: z.string().describe("Short label like 'Directly relevant' or 'Related to your task'"),
   confidenceLabel: z.string().describe("How confident the coach is: 'High', 'Medium', or 'Low'"),
