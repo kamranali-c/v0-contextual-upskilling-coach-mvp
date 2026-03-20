@@ -91,24 +91,24 @@ If the context is insufficient to give specific advice:
 
 export function formatContextMessage(req: CoachRequest): string {
   const sections = [
-    \`CURRENT TASK: \${req.taskTitle} (\${req.taskType})\`,
-    \`TRIGGER: \${req.triggerType} — \${req.triggerReason}\`,
-    \`RETRIES: \${req.retries}\`,
-    \`RECENT ACTIONS:\n\${req.recentActions.map((a) => \`  - \${a}\`).join("\\n")}\`,
-    \`USER GOAL: \${req.userGoal}\`,
-    \`CONFIDENCE: \${req.confidenceLevel}\`,
-    \`LEARNING PREFERENCE: \${req.learningPreference}\`,
-    \`AVAILABLE TIME: \${req.availableMinutes} minutes\`,
-    \`PAGE: \${req.currentPage}\`,
+    `CURRENT TASK: ${req.taskTitle} (${req.taskType})`,
+    `TRIGGER: ${req.triggerType} — ${req.triggerReason}`,
+    `RETRIES: ${req.retries}`,
+    `RECENT ACTIONS:\n${req.recentActions.map((a) => `  - ${a}`).join("\n")}`,
+    `USER GOAL: ${req.userGoal}`,
+    `CONFIDENCE: ${req.confidenceLevel}`,
+    `LEARNING PREFERENCE: ${req.learningPreference}`,
+    `AVAILABLE TIME: ${req.availableMinutes} minutes`,
+    `PAGE: ${req.currentPage}`,
   ]
-  return sections.join("\\n\\n")
+  return sections.join("\n\n")
 }
 
 // ── Fallback Plan ────────────────────────────────────────────────────────────
 
 export function getFallbackPlan(req: CoachRequest) {
   return {
-    title: \`Quick guide: \${req.taskTitle}\`,
+    title: `Quick guide: ${req.taskTitle}`,
     contextSummary: "Context was limited, but it appears you are working on a technical task that involves database or platform configuration.",
     whyNow: "This is a general starting point for your current task. Building foundational understanding of the tools you are working with will help you move faster and make fewer mistakes in production.",
     quickExplanation:
@@ -116,7 +116,7 @@ export function getFallbackPlan(req: CoachRequest) {
     steps: [
       {
         title: "Review the basics",
-        description: \`Take a moment to review the documentation or help section related to \${req.taskType.toLowerCase()}.\`,
+        description: `Take a moment to review the documentation or help section related to ${req.taskType.toLowerCase()}.`,
         type: "explain" as const,
       },
       {
