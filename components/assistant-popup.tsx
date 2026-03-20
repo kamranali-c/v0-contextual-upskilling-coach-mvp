@@ -315,7 +315,7 @@ export function AssistantPopup() {
     return (
       <button
         onClick={() => setOpen(true)}
-        className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-accent text-accent-foreground flex items-center justify-center shadow-lg shadow-accent/30 hover:scale-110 hover:shadow-xl hover:shadow-accent/40 transition-all duration-200 cursor-pointer"
+        className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-white border-2 border-neutral-200 text-neutral-700 flex items-center justify-center shadow-md hover:shadow-lg hover:border-neutral-300 hover:scale-105 transition-all duration-200 cursor-pointer"
         aria-label="Open Upskilling Coach"
       >
         <span className="text-xl font-bold leading-none">?</span>
