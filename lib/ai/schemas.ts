@@ -31,6 +31,7 @@ export const coachingPlanSchema = z.object({
     .array(
       z.object({
         title: z.string().describe("Video title"),
+        url: z.string().describe("Full YouTube URL for the video, e.g. https://www.youtube.com/watch?v=..."),
         channel: z.string().describe("YouTube channel or creator name"),
         reason: z.string().describe("Short reason why this video is relevant to the current task"),
         duration: z.string().describe("Estimated duration like '12 min' or '8 min'"),
@@ -46,6 +47,7 @@ export const coachingPlanSchema = z.object({
     .array(
       z.object({
         title: z.string().describe("Document or article title"),
+        url: z.string().describe("Full URL to the documentation page"),
         source: z.string().describe("Source like 'PostgreSQL Docs', 'Supabase Guide', etc."),
         summary: z.string().describe("1 sentence summary of what the doc covers"),
         reason: z.string().describe("Short reason why this doc matters for the current task"),

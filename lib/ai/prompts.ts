@@ -29,12 +29,10 @@ Return a structured coaching plan with ALL of the following:
 
 ### 1. Context Summary
 A 1-2 sentence summary of what you think the user is currently doing based on the task and recent actions.
-Example: "You are configuring database security for a multi-tenant app."
 
 ### 2. Why This Matters Now
 A 2-3 sentence explanation of why this topic is important RIGHT NOW in the user's workflow.
 Be specific. Tie it to business impact, production readiness, or skill progression.
-Example: "RLS matters because this project is moving from simple data access to tenant-aware production behaviour."
 
 ### 3. Recommended Learning Path
 2-5 action steps forming a learning sequence tailored to the specific task.
@@ -43,17 +41,19 @@ Each step should have a title, description, and type (explain/do/check/practice)
 ### 4. YouTube Videos to Watch
 3-5 curated video recommendations. Each must include:
 - A realistic, specific title
-- A realistic channel/creator name
+- A real, valid YouTube URL. Use actual YouTube video URLs you know exist, or construct realistic ones.
+  For example: https://www.youtube.com/watch?v=dQw4w9WgXcQ
+  If you are unsure of the exact URL, use a realistic search-based URL like:
+  https://www.youtube.com/results?search_query=postgresql+row+level+security+tutorial
+- A realistic channel/creator name (e.g. "Hussein Nasser", "Fireship", "Web Dev Simplified", "Supabase", "Traversy Media")
 - A short reason why this video is relevant
 - An estimated duration (e.g. "12 min")
 - A difficulty level (Beginner/Intermediate/Advanced)
 
-Make video titles and channels feel real and specific, like actual YouTube content.
-Examples of good channel names: "Hussein Nasser", "Fireship", "Web Dev Simplified", "Supabase", "PostgresTV"
-
 ### 5. Docs to Read
 3-5 documentation resources. Each must include:
 - A specific title
+- A real URL to the actual documentation page (e.g. https://www.postgresql.org/docs/current/ddl-rowsecurity.html)
 - A source (e.g. "PostgreSQL Docs", "Supabase Guide", "MDN Web Docs")
 - A 1-sentence summary
 - A short reason why it matters for the current task
@@ -66,7 +66,6 @@ One primary practice exercise with:
 
 ### 7. Roadmap Alignment
 3-6 roadmap or business goal tags showing how this task maps to broader objectives.
-Examples: "Platform Foundations", "Security Hardening", "Production Readiness"
 
 ### 8. Skill Growth Mapping
 3-6 capability areas this work develops. Each must have:
@@ -92,24 +91,24 @@ If the context is insufficient to give specific advice:
 
 export function formatContextMessage(req: CoachRequest): string {
   const sections = [
-    `CURRENT TASK: ${req.taskTitle} (${req.taskType})`,
-    `TRIGGER: ${req.triggerType} — ${req.triggerReason}`,
-    `RETRIES: ${req.retries}`,
-    `RECENT ACTIONS:\n${req.recentActions.map((a) => `  - ${a}`).join("\n")}`,
-    `USER GOAL: ${req.userGoal}`,
-    `CONFIDENCE: ${req.confidenceLevel}`,
-    `LEARNING PREFERENCE: ${req.learningPreference}`,
-    `AVAILABLE TIME: ${req.availableMinutes} minutes`,
-    `PAGE: ${req.currentPage}`,
+    \`CURRENT TASK: \${req.taskTitle} (\${req.taskType})\`,
+    \`TRIGGER: \${req.triggerType} — \${req.triggerReason}\`,
+    \`RETRIES: \${req.retries}\`,
+    \`RECENT ACTIONS:\n\${req.recentActions.map((a) => \`  - \${a}\`).join("\\n")}\`,
+    \`USER GOAL: \${req.userGoal}\`,
+    \`CONFIDENCE: \${req.confidenceLevel}\`,
+    \`LEARNING PREFERENCE: \${req.learningPreference}\`,
+    \`AVAILABLE TIME: \${req.availableMinutes} minutes\`,
+    \`PAGE: \${req.currentPage}\`,
   ]
-  return sections.join("\n\n")
+  return sections.join("\\n\\n")
 }
 
 // ── Fallback Plan ────────────────────────────────────────────────────────────
 
 export function getFallbackPlan(req: CoachRequest) {
   return {
-    title: `Quick guide: ${req.taskTitle}`,
+    title: \`Quick guide: \${req.taskTitle}\`,
     contextSummary: "Context was limited, but it appears you are working on a technical task that involves database or platform configuration.",
     whyNow: "This is a general starting point for your current task. Building foundational understanding of the tools you are working with will help you move faster and make fewer mistakes in production.",
     quickExplanation:
@@ -117,7 +116,7 @@ export function getFallbackPlan(req: CoachRequest) {
     steps: [
       {
         title: "Review the basics",
-        description: `Take a moment to review the documentation or help section related to ${req.taskType.toLowerCase()}.`,
+        description: \`Take a moment to review the documentation or help section related to \${req.taskType.toLowerCase()}.\`,
         type: "explain" as const,
       },
       {
@@ -128,45 +127,51 @@ export function getFallbackPlan(req: CoachRequest) {
     ],
     videos: [
       {
-        title: "Getting Started with Database Configuration",
-        channel: "Fireship",
-        reason: "Quick overview of database setup fundamentals",
-        duration: "10 min",
+        title: "SQL For Beginners Tutorial",
+        url: "https://www.youtube.com/watch?v=HXV3zeQKqGY",
+        channel: "freeCodeCamp",
+        reason: "Comprehensive SQL fundamentals covering queries, joins, and data manipulation",
+        duration: "44 min",
         difficulty: "Beginner" as const,
       },
       {
-        title: "Database Best Practices for Web Developers",
-        channel: "Web Dev Simplified",
-        reason: "Covers common patterns you will encounter",
-        duration: "15 min",
+        title: "7 Database Paradigms",
+        url: "https://www.youtube.com/watch?v=W2Z7fbCLSTw",
+        channel: "Fireship",
+        reason: "Quick overview of different database types and when to use each one",
+        duration: "10 min",
         difficulty: "Intermediate" as const,
       },
       {
-        title: "Production Database Checklist",
+        title: "Database Indexing Explained",
+        url: "https://www.youtube.com/watch?v=HubezKbFL7E",
         channel: "Hussein Nasser",
-        reason: "Ensures your database is production-ready",
-        duration: "12 min",
+        reason: "Understanding indexes is critical for query performance optimization",
+        duration: "18 min",
         difficulty: "Intermediate" as const,
       },
     ],
     docs: [
       {
-        title: "Database Configuration Guide",
-        source: "Platform Documentation",
-        summary: "Complete guide to setting up and configuring your database.",
-        reason: "Covers the fundamentals of your current task",
+        title: "PostgreSQL: Getting Started",
+        url: "https://www.postgresql.org/docs/current/tutorial-start.html",
+        source: "PostgreSQL Docs",
+        summary: "Official getting started guide covering basic PostgreSQL setup and usage.",
+        reason: "Covers the fundamentals of your current database task",
       },
       {
-        title: "Security Best Practices",
+        title: "Supabase Database Guide",
+        url: "https://supabase.com/docs/guides/database/overview",
+        source: "Supabase",
+        summary: "Complete guide to working with databases on the Supabase platform.",
+        reason: "Platform-specific guidance for database configuration and management",
+      },
+      {
+        title: "OWASP Database Security Cheat Sheet",
+        url: "https://cheatsheetseries.owasp.org/cheatsheets/Database_Security_Cheat_Sheet.html",
         source: "OWASP",
         summary: "Security checklist for database-backed applications.",
-        reason: "Ensures your configuration follows security standards",
-      },
-      {
-        title: "Performance Optimization Guide",
-        source: "Platform Documentation",
-        summary: "Tips for optimizing database queries and configuration.",
-        reason: "Helps you build performant database queries from the start",
+        reason: "Ensures your configuration follows industry security standards",
       },
     ],
     practiceTask: {
