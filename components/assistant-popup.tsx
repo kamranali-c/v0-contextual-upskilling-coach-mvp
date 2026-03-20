@@ -28,6 +28,15 @@ import {
   Zap,
   ArrowRight,
   GripVertical,
+  User,
+  Trophy,
+  Flame,
+  Award,
+  Database,
+  Code,
+  GitBranch,
+  Settings,
+  History,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import type { CoachingPlan } from "@/lib/ai/schemas"
@@ -105,6 +114,53 @@ const categoryStyles: Record<Suggestion["category"], { label: string; color: str
   quality:      { label: "Quality",       color: "text-chart-3" },
   deployment:   { label: "Deployment",    color: "text-chart-1" },
   resource:     { label: "Resource",      color: "text-chart-2" },
+}
+
+// ── User profile data ───────────────────────────────────────────────────────
+interface UserSkill {
+  name: string
+  level: number
+  maxLevel: number
+  category: string
+  icon: typeof Database
+}
+
+interface RecentTopic {
+  id: string
+  title: string
+  timestamp: Date
+  category: string
+  icon: typeof BookOpen
+}
+
+const USER_SKILLS: UserSkill[] = [
+  { name: "SQL Queries", level: 3, maxLevel: 5, category: "Database", icon: Database },
+  { name: "API Integration", level: 2, maxLevel: 5, category: "Backend", icon: Code },
+  { name: "Deployment", level: 4, maxLevel: 5, category: "DevOps", icon: GitBranch },
+  { name: "Security", level: 2, maxLevel: 5, category: "Security", icon: Shield },
+  { name: "Architecture", level: 1, maxLevel: 5, category: "Design", icon: Wrench },
+]
+
+const RECENT_TOPICS: RecentTopic[] = [
+  { id: "rt1", title: "Row Level Security (RLS)", timestamp: new Date(Date.now() - 30 * 60 * 1000), category: "Security", icon: Shield },
+  { id: "rt2", title: "SQL LEFT JOIN Patterns", timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000), category: "Database", icon: Database },
+  { id: "rt3", title: "Production Deployment", timestamp: new Date(Date.now() - 24 * 60 * 60 * 1000), category: "DevOps", icon: GitBranch },
+  { id: "rt4", title: "Environment Variables", timestamp: new Date(Date.now() - 48 * 60 * 60 * 1000), category: "Configuration", icon: Settings },
+]
+
+const USER_STATS = {
+  name: "Alex Chen",
+  email: "alex.chen@company.com",
+  role: "Full Stack Developer",
+  creditsEarned: 145,
+  currentStreak: 3,
+  completedSessions: 12,
+  totalLearningMinutes: 47,
+  badges: [
+    { id: "b1", name: "Quick Learner", icon: Zap, color: "text-chart-4" },
+    { id: "b2", name: "Database Pro", icon: Database, color: "text-chart-2" },
+    { id: "b3", name: "Streak Master", icon: Flame, color: "text-warning" },
+  ],
 }
 
 // ── Suggestion Card ─────────────────────────────────────────────────────────
@@ -185,7 +241,7 @@ function SectionHeader({ icon: Icon, title, color = "text-accent" }: { icon: typ
   )
 }
 
-// ── Video Card ──────────────────────────────────────────────────────────────
+// ── Video Card ───────────────────────────────────────────��──────────────────
 function VideoCard({ video, isExpanded }: { video: CoachingPlan["videos"][number]; isExpanded: boolean }) {
   return (
     <div className={`group/vid rounded-lg border border-border bg-card/60 hover:bg-card hover:border-chart-1/30 transition-all ${isExpanded ? "p-4" : "p-3"}`}>
@@ -253,6 +309,189 @@ function DocCard({ doc, isExpanded }: { doc: CoachingPlan["docs"][number]; isExp
       </div>
       <p className={`text-muted-foreground/80 mt-1.5 leading-relaxed ${isExpanded ? "text-[11px]" : "text-[10px]"}`}>{doc.summary}</p>
       <p className={`text-muted-foreground/60 mt-1 italic ${isExpanded ? "text-[10px]" : "text-[10px]"}`}>{doc.reason}</p>
+    </div>
+  )
+}
+
+// ── Skill Tree Item ─────────────────────────────────────────────────────────
+function SkillTreeItem({ skill }: { skill: UserSkill }) {
+  const Icon = skill.icon
+  const percentage = (skill.level / skill.maxLevel) * 100
+
+  return (
+    <div className="flex items-center gap-3 p-2.5 rounded-lg bg-secondary/40 hover:bg-secondary/60 transition-colors">
+      <div className="w-8 h-8 rounded-lg bg-accent/10 flex items-center justify-center shrink-0">
+        <Icon className="w-4 h-4 text-accent" />
+      </div>
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center justify-between mb-1">
+          <span className="text-xs font-medium text-foreground">{skill.name}</span>
+          <span className="text-[10px] text-muted-foreground">Lvl {skill.level}/{skill.maxLevel}</span>
+        </div>
+        <div className="h-1.5 rounded-full bg-border overflow-hidden">
+          <div
+            className="h-full rounded-full bg-accent transition-all duration-500"
+            style={{ width: `${percentage}%` }}
+          />
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ── Recent Topic Item ───────────────────────────────────────────────────────
+function RecentTopicItem({ topic }: { topic: RecentTopic }) {
+  const Icon = topic.icon
+  const timeAgo = getTimeAgo(topic.timestamp)
+
+  return (
+    <div className="flex items-center gap-2.5 p-2 rounded-lg hover:bg-secondary/40 transition-colors cursor-pointer group">
+      <div className="w-6 h-6 rounded flex items-center justify-center bg-secondary shrink-0">
+        <Icon className="w-3 h-3 text-muted-foreground group-hover:text-accent transition-colors" />
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className="text-xs text-foreground truncate">{topic.title}</p>
+        <p className="text-[10px] text-muted-foreground">{timeAgo}</p>
+      </div>
+      <ChevronRight className="w-3 h-3 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+    </div>
+  )
+}
+
+// ── Time ago helper ─────────────────────────────────────────────────────────
+function getTimeAgo(date: Date): string {
+  const now = new Date()
+  const diffMs = now.getTime() - date.getTime()
+  const diffMins = Math.floor(diffMs / (1000 * 60))
+  const diffHours = Math.floor(diffMs / (1000 * 60 * 60))
+  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24))
+
+  if (diffMins < 60) return `${diffMins}m ago`
+  if (diffHours < 24) return `${diffHours}h ago`
+  return `${diffDays}d ago`
+}
+
+// ── User Profile View ───────────────────────────────────────────────────────
+function UserProfileView({
+  onBack,
+  panelSize,
+}: {
+  onBack: () => void
+  panelSize: PanelSize
+}) {
+  const isExpanded = panelSize !== "compact"
+
+  return (
+    <div className="flex flex-col h-full">
+      {/* Profile header */}
+      <div className="flex items-center justify-between px-4 pt-3 pb-2 border-b border-border bg-popover/80 shrink-0">
+        <button
+          onClick={onBack}
+          className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
+        >
+          <ChevronLeft className="w-3.5 h-3.5" />
+          Back
+        </button>
+        <button className="flex items-center gap-1 text-[10px] px-2 py-1 rounded-md border border-border bg-secondary/50 text-muted-foreground hover:text-foreground transition-colors">
+          <Settings className="w-3 h-3" />
+          Settings
+        </button>
+      </div>
+
+      <div className="flex-1 overflow-y-auto">
+        {/* User Info Section */}
+        <div className={`px-4 border-b border-border ${isExpanded ? "py-5" : "py-4"}`}>
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-12 h-12 rounded-xl bg-accent/15 flex items-center justify-center">
+              <User className="w-6 h-6 text-accent" />
+            </div>
+            <div>
+              <h3 className="text-sm font-semibold text-foreground">{USER_STATS.name}</h3>
+              <p className="text-xs text-muted-foreground">{USER_STATS.role}</p>
+              <p className="text-[10px] text-muted-foreground/70">{USER_STATS.email}</p>
+            </div>
+          </div>
+
+          {/* Stats Grid */}
+          <div className="grid grid-cols-2 gap-2">
+            <div className="flex items-center gap-2 p-2.5 rounded-lg bg-secondary/40">
+              <div className="w-8 h-8 rounded-lg bg-chart-4/15 flex items-center justify-center">
+                <Trophy className="w-4 h-4 text-chart-4" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-foreground">{USER_STATS.creditsEarned}</p>
+                <p className="text-[10px] text-muted-foreground">Credits</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 p-2.5 rounded-lg bg-secondary/40">
+              <div className="w-8 h-8 rounded-lg bg-warning/15 flex items-center justify-center">
+                <Flame className="w-4 h-4 text-warning" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-foreground">{USER_STATS.currentStreak}</p>
+                <p className="text-[10px] text-muted-foreground">Day Streak</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 p-2.5 rounded-lg bg-secondary/40">
+              <div className="w-8 h-8 rounded-lg bg-success/15 flex items-center justify-center">
+                <BookOpen className="w-4 h-4 text-success" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-foreground">{USER_STATS.completedSessions}</p>
+                <p className="text-[10px] text-muted-foreground">Sessions</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 p-2.5 rounded-lg bg-secondary/40">
+              <div className="w-8 h-8 rounded-lg bg-chart-2/15 flex items-center justify-center">
+                <Clock className="w-4 h-4 text-chart-2" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-foreground">{USER_STATS.totalLearningMinutes}</p>
+                <p className="text-[10px] text-muted-foreground">Minutes</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Badges Section */}
+        <div className={`px-4 border-b border-border ${isExpanded ? "py-5" : "py-4"}`}>
+          <SectionHeader icon={Award} title="Badges Earned" color="text-chart-4" />
+          <div className="flex flex-wrap gap-2">
+            {USER_STATS.badges.map((badge) => {
+              const BadgeIcon = badge.icon
+              return (
+                <div
+                  key={badge.id}
+                  className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-secondary/40 border border-border hover:border-accent/30 transition-colors"
+                >
+                  <BadgeIcon className={`w-3.5 h-3.5 ${badge.color}`} />
+                  <span className="text-[11px] font-medium text-foreground">{badge.name}</span>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+
+        {/* Skill Tree Section */}
+        <div className={`px-4 border-b border-border ${isExpanded ? "py-5" : "py-4"}`}>
+          <SectionHeader icon={TrendingUp} title="Skill Tree" color="text-accent" />
+          <div className="flex flex-col gap-2">
+            {USER_SKILLS.map((skill) => (
+              <SkillTreeItem key={skill.name} skill={skill} />
+            ))}
+          </div>
+        </div>
+
+        {/* Recent Topics Section */}
+        <div className={`px-4 ${isExpanded ? "py-5" : "py-4"}`}>
+          <SectionHeader icon={History} title="Recent Topics" color="text-chart-2" />
+          <div className="flex flex-col gap-1">
+            {RECENT_TOPICS.map((topic) => (
+              <RecentTopicItem key={topic.id} topic={topic} />
+            ))}
+          </div>
+        </div>
+      </div>
     </div>
   )
 }
@@ -495,8 +734,9 @@ export function AssistantPopup() {
   const [plan, setPlan] = useState<CoachingPlan | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [showProfile, setShowProfile] = useState(false)
 
-  const isDetail = !!selectedSuggestion
+  const isDetail = !!selectedSuggestion || showProfile
   const config = SIZE_CONFIG[panelSize]
 
   function cyclePanelSize() {
@@ -596,7 +836,7 @@ export function AssistantPopup() {
           </div>
           {!minimized && (
             <span className="text-[10px] text-muted-foreground">
-              {isDetail ? "Coaching response" : "Upskilling Coach — Live suggestions"}
+              {showProfile ? "User Profile" : selectedSuggestion ? "Coaching response" : "Upskilling Coach — Live suggestions"}
             </span>
           )}
         </div>
@@ -612,6 +852,23 @@ export function AssistantPopup() {
               {sizeLabel[panelSize]}
             </button>
           )}
+          {/* Profile button */}
+          <button
+            onClick={() => {
+              setShowProfile(!showProfile)
+              setSelectedSuggestion(null)
+              setPlan(null)
+              setError(null)
+            }}
+            className={`w-6 h-6 rounded flex items-center justify-center transition-colors ${
+              showProfile
+                ? "bg-accent/20 text-accent"
+                : "text-muted-foreground hover:text-foreground hover:bg-secondary"
+            }`}
+            title="User Profile"
+          >
+            <User className="w-3.5 h-3.5" />
+          </button>
           <button
             onClick={() => setMinimized(!minimized)}
             className="w-6 h-6 rounded flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
@@ -620,7 +877,7 @@ export function AssistantPopup() {
             {minimized ? <Maximize2 className="w-3.5 h-3.5" /> : <Minus className="w-3.5 h-3.5" />}
           </button>
           <button
-            onClick={() => { setOpen(false); setPanelSize("compact") }}
+            onClick={() => { setOpen(false); setPanelSize("compact"); setShowProfile(false) }}
             className="w-6 h-6 rounded flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
             title="Close"
           >
@@ -632,7 +889,12 @@ export function AssistantPopup() {
       {/* Body */}
       {!minimized && (
         <div className="flex-1 overflow-hidden flex flex-col min-h-0">
-          {selectedSuggestion ? (
+          {showProfile ? (
+            <UserProfileView
+              onBack={() => setShowProfile(false)}
+              panelSize={panelSize}
+            />
+          ) : selectedSuggestion ? (
             <CoachDetail
               suggestion={selectedSuggestion}
               plan={plan}
