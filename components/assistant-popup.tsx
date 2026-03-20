@@ -32,46 +32,46 @@ const SUGGESTIONS: Suggestion[] = [
   {
     id: "s1",
     category: "deployment",
-    title: "Add health checks to improve deployment reliability",
+    title: "Enable Row Level Security (RLS) for your users table",
     description:
-      "Your API route does not include a health endpoint. Adding one helps monitoring and prevents routing traffic to unhealthy instances.",
-    relevance: "Based on: current deployment in route.ts",
+      "Your users table has RLS disabled. Enabling it ensures data isolation between tenants and prevents unauthorized access to sensitive user data.",
+    relevance: "Based on: RLS status warning in schema panel",
     icon: Shield,
   },
   {
     id: "s2",
     category: "skill",
-    title: "Next.js Server Actions — consider learning streaming patterns",
+    title: "Learn SQL JOINs — your query uses LEFT JOIN effectively",
     description:
-      "Your current route.ts uses a traditional POST handler. Streaming responses with Server Actions can improve perceived performance.",
-    relevance: "Based on: file open (app/api/route.ts)",
+      "Great use of LEFT JOIN to count orders per user! Want to learn about other JOIN types and when to use them for more complex reporting queries?",
+    relevance: "Based on: current query in editor",
     icon: BookOpen,
   },
   {
     id: "s3",
     category: "quality",
-    title: "Strengthen error handling in your API route",
+    title: "Add an index on orders.user_id for better performance",
     description:
-      "The current catch block returns a generic 500. Consider structured error responses with specific status codes and messages.",
-    relevance: "Based on: recent commit (fix: update API route error handling)",
+      "Your query joins users and orders on user_id. Adding an index on this foreign key column will significantly speed up this and similar queries.",
+    relevance: "Based on: query execution plan analysis",
     icon: TestTube,
   },
   {
     id: "s4",
     category: "architecture",
-    title: "Your task maps well to platform engineering skills",
+    title: "Database design patterns for multi-tenant SaaS",
     description:
-      "Setting up reliable API routes, deployment pipelines, and monitoring is core platform engineering. Building these skills compounds.",
-    relevance: "Based on: deployment activity pattern",
+      "Your customer-portal schema suggests a multi-tenant app. Learn about tenant isolation strategies, shared vs. separate schemas, and connection pooling.",
+    relevance: "Based on: database schema structure",
     icon: Wrench,
   },
   {
     id: "s5",
     category: "resource",
-    title: "Suggested next: observability on Vercel",
+    title: "Suggested: Backup and disaster recovery best practices",
     description:
-      "Learn how to use structured logging, traces, and Vercel Monitoring to debug production issues faster.",
-    relevance: "Based on: production deployment context",
+      "Learn how to configure automated backups, point-in-time recovery, and test your restore procedures to ensure data durability.",
+    relevance: "Based on: production database context",
     icon: Lightbulb,
   },
 ]
@@ -279,17 +279,17 @@ export function AssistantPopup() {
         body: JSON.stringify({
           taskTitle: suggestion.title,
           taskType: suggestion.category,
-          currentPage: "Deployments / Build Logs",
+          currentPage: "Storage / Query Editor",
           triggerType: "contextual-suggestion",
           triggerReason: suggestion.relevance,
           retries: 0,
           recentActions: [
-            "Viewed deployment build logs",
-            "Edited app/api/route.ts",
-            "Committed: fix API route error handling",
-            "Deployed to production",
+            "Ran SQL query with LEFT JOIN",
+            "Viewed users table schema",
+            "Checked RLS status",
+            "Browsed orders table",
           ],
-          userGoal: "Improve my deployment and API practices",
+          userGoal: "Configure and optimize my database",
           confidenceLevel: "intermediate",
           learningPreference: "hands-on",
           availableMinutes: 5,
@@ -383,7 +383,7 @@ export function AssistantPopup() {
               {/* Context bar */}
               <div className="px-4 py-2.5 bg-secondary/30 border-b border-border">
                 <p className="text-[11px] text-muted-foreground">
-                  5 suggestions based on your current session
+                  5 suggestions based on your database configuration session
                 </p>
               </div>
 
