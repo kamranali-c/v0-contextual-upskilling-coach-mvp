@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect, useRef } from "react"
 import {
   Sparkles,
   X,
@@ -27,7 +27,6 @@ import {
   Clock,
   Zap,
   ArrowRight,
-  GripVertical,
   User,
   Trophy,
   Flame,
@@ -249,12 +248,11 @@ function getClientFallback(suggestionTitle: string): CoachingPlan | null {
 }
 
 // ── Size modes ──────────────────────────────────────────────────────────────
-type PanelSize = "compact" | "expanded" | "full"
+type PanelSize = "compact" | "expanded"
 
-const SIZE_CONFIG: Record<PanelSize, { width: number; height: string; detailWidth: number }> = {
-  compact:  { width: 380, height: "540px", detailWidth: 440 },
-  expanded: { width: 520, height: "75vh",  detailWidth: 560 },
-  full:     { width: 580, height: "calc(100vh - 48px)", detailWidth: 620 },
+const SIZE_CONFIG: Record<PanelSize, { maxWidth: string; height: string }> = {
+  compact:  { maxWidth: "440px", height: "540px" },
+  expanded: { maxWidth: "92%",   height: "calc(100vh - 64px)" },
 }
 
 // ── Suggestion data ─────────────────────────────────────────────────────────
@@ -398,23 +396,28 @@ const USER_STATS = {
   ] as BadgeInfo[],
 }
 
-// ── Suggestion Card ─────────────────────────────────────────────────────────
+// ── Suggestion Card ──────���────────────────────────────────────────��─────────
 function SuggestionCard({
   suggestion,
   onAskCoach,
+  index = 0,
 }: {
   suggestion: Suggestion
   onAskCoach: (suggestion: Suggestion) => void
+  index?: number
 }) {
   const [saved, setSaved] = useState(false)
   const style = categoryStyles[suggestion.category]
   const Icon = suggestion.icon
 
   return (
-    <div className="group rounded-lg border border-border bg-card/60 p-3 hover:bg-card transition-colors">
-      <div className="flex items-start gap-2.5">
-        <div className="mt-0.5 w-6 h-6 rounded flex items-center justify-center bg-secondary shrink-0">
-          <Icon className={`w-3.5 h-3.5 ${style.color}`} />
+    <div
+      className="group rounded-lg border border-border bg-card/60 p-4 hover:bg-card transition-all duration-500 ease-out animate-in fade-in slide-in-from-bottom-3"
+      style={{ animationDelay: `${index * 80}ms`, animationFillMode: "backwards" }}
+    >
+      <div className="flex items-start gap-3">
+        <div className="mt-0.5 w-7 h-7 rounded-lg flex items-center justify-center bg-secondary shrink-0">
+          <Icon className={`w-4 h-4 ${style.color}`} />
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1">
@@ -423,10 +426,10 @@ function SuggestionCard({
             </span>
           </div>
           <p className="text-sm font-medium text-foreground leading-snug">{suggestion.title}</p>
-          <p className="text-xs text-muted-foreground mt-1 leading-relaxed">{suggestion.description}</p>
-          <p className="text-[10px] text-muted-foreground/60 mt-1.5 italic">{suggestion.relevance}</p>
+          <p className="text-xs text-muted-foreground mt-1.5 leading-relaxed">{suggestion.description}</p>
+          <p className="text-[10px] text-muted-foreground/60 mt-2 italic">{suggestion.relevance}</p>
 
-          <div className="flex items-center gap-1 mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
+          <div className="flex items-center gap-1 mt-2.5 opacity-0 group-hover:opacity-100 transition-opacity">
             <button
               onClick={() => onAskCoach(suggestion)}
               className="flex items-center gap-1 text-[11px] text-accent hover:text-accent/80 px-1.5 py-0.5 rounded transition-colors"
@@ -870,8 +873,8 @@ function CoachDetail({
 }) {
   const [saved, setSaved] = useState(false)
   const [helpful, setHelpful] = useState(false)
-  const isExpanded = panelSize !== "compact"
-  const useGrid = panelSize === "full" || panelSize === "expanded"
+  const isExpanded = panelSize === "expanded"
+  const useGrid = panelSize === "expanded"
 
   return (
     <div className="flex flex-col h-full">
@@ -987,7 +990,7 @@ function CoachDetail({
             {/* 4. Videos to Watch */}
             <div className={`px-4 border-b border-border ${isExpanded ? "py-5" : "py-4"}`}>
               <SectionHeader icon={Play} title="Videos to watch" color="text-chart-1" />
-              <div className={useGrid ? "grid grid-cols-2 gap-2.5" : "flex flex-col gap-2"}>
+              <div className={useGrid ? "grid grid-cols-3 gap-3" : "flex flex-col gap-2"}>
                 {plan.videos.map((video, i) => (
                   <VideoCard key={i} video={video} isExpanded={isExpanded} />
                 ))}
@@ -997,7 +1000,7 @@ function CoachDetail({
             {/* 5. Docs to Read */}
             <div className={`px-4 border-b border-border ${isExpanded ? "py-5" : "py-4"}`}>
               <SectionHeader icon={FileText} title="Docs to read" color="text-chart-2" />
-              <div className={useGrid ? "grid grid-cols-2 gap-2.5" : "flex flex-col gap-2"}>
+              <div className={useGrid ? "grid grid-cols-3 gap-3" : "flex flex-col gap-2"}>
                 {plan.docs.map((doc, i) => (
                   <DocCard key={i} doc={doc} isExpanded={isExpanded} />
                 ))}
@@ -1046,7 +1049,7 @@ function CoachDetail({
             {/* 8. Skill Growth */}
             <div className={`px-4 border-b border-border ${isExpanded ? "py-5" : "py-4"}`}>
               <SectionHeader icon={TrendingUp} title="Skill growth" color="text-accent" />
-              <div className={useGrid ? "grid grid-cols-2 gap-1.5" : "flex flex-col gap-1.5"}>
+              <div className={useGrid ? "grid grid-cols-4 gap-2" : "flex flex-col gap-1.5"}>
                 {plan.skillAreas.map((skill, i) => (
                   <div key={i} className="flex items-center justify-between rounded-md bg-secondary/30 px-2.5 py-1.5">
                     <span className="text-[11px] font-medium text-foreground/80">{skill.name}</span>
@@ -1081,23 +1084,39 @@ function CoachDetail({
 
 // ── Main popup ──────────────────────────────────────────────────────────────
 export function AssistantPopup() {
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState(true)
   const [minimized, setMinimized] = useState(false)
-  const [panelSize, setPanelSize] = useState<PanelSize>("compact")
+  const [panelSize, setPanelSize] = useState<PanelSize>("expanded")
   const [selectedSuggestion, setSelectedSuggestion] = useState<Suggestion | null>(null)
   const [plan, setPlan] = useState<CoachingPlan | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [showProfile, setShowProfile] = useState(false)
 
-  const isDetail = !!selectedSuggestion || showProfile
+  // Animation state: tracks whether the panel has finished its entrance animation
+  const [panelVisible, setPanelVisible] = useState(false)
+  const animationFrameRef = useRef<number | null>(null)
+
+  useEffect(() => {
+    if (open) {
+      // Trigger entrance animation on next frame so the initial state renders first
+      animationFrameRef.current = requestAnimationFrame(() => {
+        animationFrameRef.current = requestAnimationFrame(() => {
+          setPanelVisible(true)
+        })
+      })
+    } else {
+      setPanelVisible(false)
+    }
+    return () => {
+      if (animationFrameRef.current) cancelAnimationFrame(animationFrameRef.current)
+    }
+  }, [open])
+
   const config = SIZE_CONFIG[panelSize]
 
-  function cyclePanelSize() {
-    const order: PanelSize[] = ["compact", "expanded", "full"]
-    const current = order.indexOf(panelSize)
-    const next = (current + 1) % order.length
-    setPanelSize(order[next])
+  function togglePanelSize() {
+    setPanelSize(panelSize === "expanded" ? "compact" : "expanded")
   }
 
   async function fetchPlan(suggestion: Suggestion) {
@@ -1156,8 +1175,8 @@ export function AssistantPopup() {
   if (!open) {
     return (
       <button
-        onClick={() => setOpen(true)}
-        className="fixed bottom-6 right-6 z-50 flex items-center gap-2.5 pl-2.5 pr-4 py-2 rounded-full bg-popover border border-border shadow-2xl shadow-black/40 hover:scale-105 transition-transform"
+        onClick={() => { setOpen(true); setPanelSize("expanded") }}
+        className="fixed bottom-6 right-6 z-50 flex items-center gap-2.5 pl-2.5 pr-4 py-2 rounded-full bg-popover border border-border shadow-2xl shadow-black/40 hover:scale-105 transition-all duration-500 ease-out animate-in fade-in slide-in-from-bottom-2"
       >
         <img
           src="/flowstate-logo.jpg"
@@ -1170,22 +1189,25 @@ export function AssistantPopup() {
     )
   }
 
-  const panelWidth = isDetail ? config.detailWidth : config.width
-  const panelHeight = minimized ? "52px" : config.height
-
-  const sizeLabel: Record<PanelSize, string> = {
-    compact: "Compact",
-    expanded: "Expanded",
-    full: "Full",
-  }
+  const isExpanded = panelSize === "expanded"
 
   return (
     <div
-      className="fixed bottom-6 right-6 z-50 flex flex-col rounded-xl border border-border bg-popover shadow-2xl shadow-black/40 overflow-hidden transition-all duration-300 ease-in-out"
+      className={`fixed z-50 flex flex-col rounded-xl border border-border bg-popover shadow-2xl shadow-black/40 overflow-hidden transition-all duration-500 ease-out ${
+        isExpanded && !minimized
+          ? "inset-x-0 mx-auto bottom-4"
+          : "bottom-6 right-6"
+      } ${
+        panelVisible
+          ? "opacity-100 scale-100 translate-y-0"
+          : "opacity-0 scale-95 translate-y-4"
+      }`}
       style={{
-        width: minimized ? 320 : panelWidth,
-        height: panelHeight,
-        maxHeight: "calc(100vh - 48px)",
+        width: isExpanded && !minimized ? undefined : (minimized ? 320 : 440),
+        maxWidth: isExpanded && !minimized ? config.maxWidth : undefined,
+        height: minimized ? "52px" : config.height,
+        maxHeight: "calc(100vh - 32px)",
+        transformOrigin: isExpanded ? "center bottom" : "right bottom",
       }}
     >
       {/* Header */}
@@ -1212,12 +1234,12 @@ export function AssistantPopup() {
           {/* Size toggle */}
           {!minimized && (
             <button
-              onClick={cyclePanelSize}
+              onClick={togglePanelSize}
               className="flex items-center gap-1 px-1.5 py-1 rounded text-[9px] font-medium text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
-              title={`Size: ${sizeLabel[panelSize]} — click to cycle`}
+              title={isExpanded ? "Switch to compact mode" : "Switch to expanded mode"}
             >
-              <GripVertical className="w-3 h-3" />
-              {sizeLabel[panelSize]}
+              {isExpanded ? <Minimize2 className="w-3 h-3" /> : <Maximize2 className="w-3 h-3" />}
+              {isExpanded ? "Compact" : "Expand"}
             </button>
           )}
           {/* Profile button */}
@@ -1247,7 +1269,7 @@ export function AssistantPopup() {
             {minimized ? <Maximize2 className="w-3.5 h-3.5" /> : <Minus className="w-3.5 h-3.5" />}
           </button>
           <button
-            onClick={() => { setOpen(false); setPanelSize("compact"); setShowProfile(false) }}
+            onClick={() => { setOpen(false); setPanelSize("expanded"); setShowProfile(false) }}
             className="w-6 h-6 rounded flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
             title="Close"
           >
@@ -1281,25 +1303,27 @@ export function AssistantPopup() {
           ) : (
             <>
               {/* Context bar */}
-              <div className="px-4 py-2.5 bg-secondary/30 border-b border-border shrink-0">
-                <p className="text-[11px] text-muted-foreground">
+              <div className={`bg-secondary/30 border-b border-border shrink-0 ${isExpanded ? "px-6 py-3" : "px-4 py-2.5"}`}>
+                <p className={`text-muted-foreground ${isExpanded ? "text-xs" : "text-[11px]"}`}>
                   5 suggestions based on your database configuration session
                 </p>
               </div>
 
               {/* Suggestions list */}
-              <div className="flex-1 overflow-y-auto p-3 flex flex-col gap-2">
-                {SUGGESTIONS.map((s) => (
-                  <SuggestionCard key={s.id} suggestion={s} onAskCoach={handleAskCoach} />
+              <div className={`flex-1 overflow-y-auto p-4 ${
+                isExpanded ? "grid grid-cols-2 gap-3 auto-rows-min content-start" : "flex flex-col gap-2"
+              }`}>
+                {SUGGESTIONS.map((s, i) => (
+                  <SuggestionCard key={s.id} suggestion={s} onAskCoach={handleAskCoach} index={i} />
                 ))}
               </div>
 
               {/* Footer */}
-              <div className="px-4 py-2.5 border-t border-border flex items-center justify-between bg-popover shrink-0">
-                <button className="text-[11px] text-muted-foreground hover:text-foreground transition-colors">
+              <div className={`border-t border-border flex items-center justify-between bg-popover shrink-0 ${isExpanded ? "px-6 py-3" : "px-4 py-2.5"}`}>
+                <button className={`text-muted-foreground hover:text-foreground transition-colors ${isExpanded ? "text-xs" : "text-[11px]"}`}>
                   Dismiss all
                 </button>
-                <button className="text-[11px] text-accent hover:text-accent/80 transition-colors flex items-center gap-1">
+                <button className={`text-accent hover:text-accent/80 transition-colors flex items-center gap-1 ${isExpanded ? "text-xs" : "text-[11px]"}`}>
                   View learning path
                   <ChevronRight className="w-3 h-3" />
                 </button>
