@@ -32,6 +32,213 @@ import {
 import { Button } from "@/components/ui/button"
 import type { CoachingPlan } from "@/lib/ai/schemas"
 
+// ── Client-side fallback plans (used when API is completely unreachable) ────
+const CLIENT_FALLBACKS: Record<string, CoachingPlan> = {
+  "Enable Row Level Security": {
+    title: "Secure your data with Row Level Security (RLS)",
+    contextSummary: "You are configuring a PostgreSQL database and your users table currently has RLS disabled. This is a significant security gap for any multi-tenant or user-facing application.",
+    whyNow: "Without RLS, any authenticated user can potentially access all rows in your users table. Enabling RLS before going to production prevents data leaks and is a critical step in securing your application.",
+    quickExplanation: "Row Level Security lets you define policies that control which rows a user can see or modify. This guide walks you through enabling RLS, writing your first policy, and testing it.",
+    steps: [
+      { title: "Understand what RLS does", description: "RLS adds row-level access control to your table. When enabled, all queries are filtered through policies you define. Without a policy, no rows are visible.", type: "explain" },
+      { title: "Enable RLS on your users table", description: "Run ALTER TABLE users ENABLE ROW LEVEL SECURITY; in your query editor. This activates RLS but blocks all access until you add a policy.", type: "do" },
+      { title: "Create a basic select policy", description: "Write a policy like CREATE POLICY users_select ON users FOR SELECT USING (auth.uid() = id); so users can only read their own row.", type: "do" },
+      { title: "Test with different user contexts", description: "Use the SQL editor with SET request.jwt.claims to simulate different users and verify the policy works correctly.", type: "check" },
+      { title: "Add insert/update/delete policies", description: "Extend your policies to cover all operations. Each operation type needs its own policy with appropriate USING and WITH CHECK clauses.", type: "practice" },
+    ],
+    videos: [
+      { title: "Row Level Security in PostgreSQL - Complete Guide", url: "https://www.youtube.com/watch?v=Ow_lr0SZVwA", channel: "Supabase", reason: "Official walkthrough of enabling and testing RLS policies", duration: "14 min", difficulty: "Beginner" },
+      { title: "Postgres Row Level Security is a MUST", url: "https://www.youtube.com/watch?v=sp2rPQ2bGKU", channel: "Hussein Nasser", reason: "Deep dive into why RLS matters and how it works under the hood", duration: "22 min", difficulty: "Intermediate" },
+      { title: "Supabase Auth & RLS - Full Stack Tutorial", url: "https://www.youtube.com/watch?v=0N6M5BBe9AE", channel: "The Net Ninja", reason: "Practical tutorial connecting auth with RLS policies in a real app", duration: "18 min", difficulty: "Intermediate" },
+    ],
+    docs: [
+      { title: "PostgreSQL Row Security Policies", url: "https://www.postgresql.org/docs/current/ddl-rowsecurity.html", source: "PostgreSQL Docs", summary: "Official documentation on creating and managing row-level security policies.", reason: "Canonical reference for RLS syntax and behaviour" },
+      { title: "Supabase Row Level Security Guide", url: "https://supabase.com/docs/guides/database/postgres/row-level-security", source: "Supabase", summary: "Step-by-step guide to implementing RLS with Supabase Auth integration.", reason: "Platform-specific guidance matching your current setup" },
+      { title: "RLS Performance Considerations", url: "https://supabase.com/docs/guides/database/postgres/row-level-security#performance", source: "Supabase", summary: "How RLS policies affect query performance and how to optimize them.", reason: "Ensures your policies do not degrade query speed" },
+    ],
+    practiceTask: {
+      title: "Enable RLS and write your first policy",
+      instruction: "In your query editor, enable RLS on the users table with ALTER TABLE users ENABLE ROW LEVEL SECURITY; then create a SELECT policy that restricts users to viewing only their own row.",
+      secondaryTasks: ["Try querying the users table without a policy to see that zero rows are returned", "Add a separate INSERT policy for new user registration", "Test your policies by switching between user contexts"],
+    },
+    roadmapTags: ["Security Hardening", "Data Isolation", "Production Readiness", "Compliance", "Multi-tenant Architecture"],
+    skillAreas: [
+      { name: "Database Security", relevance: "Primary" },
+      { name: "PostgreSQL Administration", relevance: "Primary" },
+      { name: "Access Control Design", relevance: "Supporting" },
+      { name: "Compliance Awareness", relevance: "Supporting" },
+    ],
+    estimatedMinutes: 10,
+    relevanceLabel: "Directly relevant to your current task",
+    confidenceLabel: "High",
+    returnToTask: "Return to the schema panel and verify RLS is now enabled on the users table.",
+    fallbackUsed: true,
+  },
+  "Learn SQL JOINs": {
+    title: "Master SQL JOINs for complex queries",
+    contextSummary: "You just ran a query using LEFT JOIN to count orders per user. This is a strong foundation. Expanding your JOIN knowledge will let you write more powerful reporting and analytics queries.",
+    whyNow: "Your current query only uses LEFT JOIN. Many real-world reporting tasks require INNER JOIN, RIGHT JOIN, self-joins, and aggregations. Building this skill now will make you significantly faster at data analysis.",
+    quickExplanation: "SQL JOINs combine rows from two or more tables based on related columns. Understanding when to use each type prevents missing data, duplicates, and incorrect counts.",
+    steps: [
+      { title: "Review JOIN types visually", description: "Understand INNER JOIN (matching rows only), LEFT JOIN (all left + matching right), RIGHT JOIN (all right + matching left), and FULL OUTER JOIN (all rows from both).", type: "explain" },
+      { title: "Rewrite your query with INNER JOIN", description: "Change your LEFT JOIN query to INNER JOIN and compare results. Notice which users disappear (those with zero orders).", type: "do" },
+      { title: "Add GROUP BY with aggregates", description: "Extend your query to use GROUP BY with COUNT, SUM, and AVG to get richer order statistics per user.", type: "practice" },
+      { title: "Try a self-join", description: "Write a query that joins the orders table to itself to find users who placed orders on the same day.", type: "practice" },
+    ],
+    videos: [
+      { title: "SQL Joins Tutorial for Beginners", url: "https://www.youtube.com/watch?v=9yeOJ0ZMUYw", channel: "Programming with Mosh", reason: "Clear visual explanation of all JOIN types with practical examples", duration: "12 min", difficulty: "Beginner" },
+      { title: "SQL Joins Explained | INNER, LEFT, RIGHT, FULL", url: "https://www.youtube.com/watch?v=2HVMiPPuPIM", channel: "Socratica", reason: "Concise comparison of JOIN types with Venn diagrams", duration: "8 min", difficulty: "Beginner" },
+      { title: "Advanced SQL Tutorial - JOINs and Subqueries", url: "https://www.youtube.com/watch?v=2Fn0WAyZV0E", channel: "freeCodeCamp", reason: "Takes JOINs further into subqueries and complex multi-table analysis", duration: "25 min", difficulty: "Intermediate" },
+    ],
+    docs: [
+      { title: "PostgreSQL JOIN Syntax", url: "https://www.postgresql.org/docs/current/queries-table-expressions.html#QUERIES-JOIN", source: "PostgreSQL Docs", summary: "Official reference for all JOIN types and syntax.", reason: "Canonical reference for the database you are using" },
+      { title: "SQL Joins - W3Schools", url: "https://www.w3schools.com/sql/sql_join.asp", source: "W3Schools", summary: "Interactive examples of INNER, LEFT, RIGHT, and FULL OUTER JOIN.", reason: "Quick interactive reference with try-it-yourself examples" },
+      { title: "Visual Explanation of SQL Joins", url: "https://blog.codinghorror.com/a-visual-explanation-of-sql-joins/", source: "Coding Horror", summary: "Famous visual guide to understanding SQL joins using Venn diagrams.", reason: "Best visual mental model for remembering JOIN behaviour" },
+    ],
+    practiceTask: {
+      title: "Compare LEFT JOIN vs INNER JOIN results",
+      instruction: "Run your current LEFT JOIN query, then rewrite it as an INNER JOIN. Compare the row counts and identify which users are missing. These are users with zero orders.",
+      secondaryTasks: ["Add a HAVING clause to filter for users with more than 3 orders", "Write a query using FULL OUTER JOIN between users and a payments table", "Create a summary report using GROUP BY with multiple aggregate functions"],
+    },
+    roadmapTags: ["Data Literacy", "SQL Proficiency", "Reporting Skills", "Analytics Foundations"],
+    skillAreas: [
+      { name: "SQL Query Writing", relevance: "Primary" },
+      { name: "Data Analysis", relevance: "Primary" },
+      { name: "Database Design Understanding", relevance: "Supporting" },
+      { name: "Reporting & BI", relevance: "Supporting" },
+    ],
+    estimatedMinutes: 10,
+    relevanceLabel: "Directly relevant to your current query",
+    confidenceLabel: "High",
+    returnToTask: "Return to the query editor and try modifying your LEFT JOIN query with the techniques above.",
+    fallbackUsed: true,
+  },
+  "Add an index": {
+    title: "Optimize query performance with indexes",
+    contextSummary: "Your current query joins users and orders on user_id. Without an index on orders.user_id, PostgreSQL performs a sequential scan on every query, which gets slower as data grows.",
+    whyNow: "Adding an index on orders.user_id can reduce your JOIN query time by 10-100x depending on table size. This is one of the highest-impact performance improvements you can make right now.",
+    quickExplanation: "An index is a data structure that lets PostgreSQL find matching rows without scanning the entire table. Creating one on foreign key columns used in JOINs and WHERE clauses dramatically speeds up queries.",
+    steps: [
+      { title: "Check current query plan", description: "Run EXPLAIN ANALYZE on your current query to see if PostgreSQL is doing a Seq Scan on the orders table.", type: "check" },
+      { title: "Create the index", description: "Run CREATE INDEX idx_orders_user_id ON orders(user_id); to add a B-tree index on the foreign key column.", type: "do" },
+      { title: "Re-run EXPLAIN ANALYZE", description: "Run EXPLAIN ANALYZE again. You should see an Index Scan instead of Seq Scan, with significantly lower execution time.", type: "check" },
+      { title: "Understand index trade-offs", description: "Indexes speed up reads but slow down writes slightly. Learn about when NOT to add indexes and how to monitor index usage.", type: "explain" },
+    ],
+    videos: [
+      { title: "Database Indexing Explained", url: "https://www.youtube.com/watch?v=HubezKbFL7E", channel: "Hussein Nasser", reason: "Deep dive into how B-tree indexes work and when to use them", duration: "18 min", difficulty: "Intermediate" },
+      { title: "PostgreSQL Performance Tuning", url: "https://www.youtube.com/watch?v=lJnV7SNy7cE", channel: "Crunchy Data", reason: "Practical PostgreSQL indexing strategies for real-world workloads", duration: "24 min", difficulty: "Intermediate" },
+      { title: "Indexing in SQL Explained in 10 Minutes", url: "https://www.youtube.com/watch?v=-qNSXPIi4D4", channel: "Web Dev Simplified", reason: "Quick, clear explanation of index types and when to use each one", duration: "10 min", difficulty: "Beginner" },
+    ],
+    docs: [
+      { title: "PostgreSQL Indexes", url: "https://www.postgresql.org/docs/current/indexes.html", source: "PostgreSQL Docs", summary: "Complete guide to PostgreSQL index types, creation, and maintenance.", reason: "Canonical reference for index syntax and options" },
+      { title: "PostgreSQL EXPLAIN Documentation", url: "https://www.postgresql.org/docs/current/sql-explain.html", source: "PostgreSQL Docs", summary: "How to read and interpret query execution plans.", reason: "Essential for verifying your index is actually being used" },
+      { title: "Index Types in PostgreSQL", url: "https://www.postgresql.org/docs/current/indexes-types.html", source: "PostgreSQL Docs", summary: "Overview of B-tree, Hash, GiST, and GIN index types.", reason: "Helps you choose the right index type for different column types" },
+    ],
+    practiceTask: {
+      title: "Add an index and measure the improvement",
+      instruction: "Run EXPLAIN ANALYZE on your current JOIN query, note the execution time. Then create an index with CREATE INDEX idx_orders_user_id ON orders(user_id); and run EXPLAIN ANALYZE again.",
+      secondaryTasks: ["Check for other foreign key columns that might benefit from indexes", "Try a composite index on (user_id, created_at) for time-range queries", "Use pg_stat_user_indexes to check index usage statistics"],
+    },
+    roadmapTags: ["Performance Optimization", "Database Tuning", "Production Readiness", "Query Efficiency", "Scalability"],
+    skillAreas: [
+      { name: "Query Performance Tuning", relevance: "Primary" },
+      { name: "Database Administration", relevance: "Primary" },
+      { name: "PostgreSQL Internals", relevance: "Supporting" },
+      { name: "Capacity Planning", relevance: "Supporting" },
+    ],
+    estimatedMinutes: 10,
+    relevanceLabel: "Directly relevant to your current query",
+    confidenceLabel: "High",
+    returnToTask: "Return to the query editor and run EXPLAIN ANALYZE to verify your new index is being used.",
+    fallbackUsed: true,
+  },
+  "Database design patterns": {
+    title: "Multi-tenant database architecture patterns",
+    contextSummary: "Your customer-portal schema suggests a multi-tenant application. Choosing the right isolation strategy now prevents costly migrations later and ensures data security between tenants.",
+    whyNow: "Multi-tenant architecture decisions are hard to change after launch. Understanding shared schemas vs. separate schemas vs. separate databases now saves significant refactoring effort.",
+    quickExplanation: "Multi-tenant databases serve multiple customers from the same application. The key decision is how to isolate tenant data: shared tables with a tenant_id column, separate schemas, or separate databases.",
+    steps: [
+      { title: "Audit your current schema", description: "Check which tables have a tenant_id or org_id column. Tables without tenant identification are a data isolation risk.", type: "check" },
+      { title: "Understand isolation strategies", description: "Learn the three approaches: shared database with tenant_id (cheapest), schema-per-tenant (balanced), and database-per-tenant (most isolated).", type: "explain" },
+      { title: "Implement tenant_id with RLS", description: "For shared-table architecture, add RLS policies that filter by tenant_id for strong isolation without separate schemas.", type: "do" },
+      { title: "Add connection pooling", description: "Multi-tenant apps need connection pooling (PgBouncer or built-in pooler) to avoid exhausting database connections.", type: "do" },
+    ],
+    videos: [
+      { title: "Multi-tenancy in PostgreSQL", url: "https://www.youtube.com/watch?v=x1fCJ7sUXCM", channel: "Hussein Nasser", reason: "Practical comparison of multi-tenant strategies with PostgreSQL", duration: "20 min", difficulty: "Intermediate" },
+      { title: "SaaS Multi-Tenant Database Design", url: "https://www.youtube.com/watch?v=joz0DoSQDNw", channel: "Fireship", reason: "Quick overview of tenant isolation patterns with real-world trade-offs", duration: "8 min", difficulty: "Beginner" },
+      { title: "Scaling Multi-Tenant Databases", url: "https://www.youtube.com/results?search_query=scaling+multi+tenant+postgres+database", channel: "Various", reason: "Talks on scaling challenges specific to multi-tenant systems", duration: "15-30 min", difficulty: "Advanced" },
+    ],
+    docs: [
+      { title: "Multi-tenant Data Architecture", url: "https://docs.aws.amazon.com/wellarchitected/latest/saas-lens/multi-tenant-data-architecture.html", source: "AWS Well-Architected", summary: "AWS best practices for designing multi-tenant data layers.", reason: "Industry-standard guidance on tenant isolation patterns" },
+      { title: "PostgreSQL Schema-based Multitenancy", url: "https://www.postgresql.org/docs/current/ddl-schemas.html", source: "PostgreSQL Docs", summary: "How to use PostgreSQL schemas for logical tenant separation.", reason: "Foundation for schema-per-tenant isolation strategy" },
+      { title: "Supabase Multi-tenancy Guide", url: "https://supabase.com/docs/guides/resources/multi-tenancy", source: "Supabase", summary: "Implementing multi-tenant patterns with Supabase RLS and auth.", reason: "Directly applicable to your current platform setup" },
+    ],
+    practiceTask: {
+      title: "Add tenant_id to your tables and create RLS policies",
+      instruction: "Add a tenant_id column to your users and orders tables. Then create RLS policies that filter all queries by the current tenant's ID.",
+      secondaryTasks: ["Create a tenants table to store tenant metadata", "Set up a search_path-based schema isolation prototype", "Benchmark query performance with 100k rows across 10 tenants"],
+    },
+    roadmapTags: ["Architecture Design", "Multi-tenancy", "Data Isolation", "Scalability", "SaaS Foundations", "Security"],
+    skillAreas: [
+      { name: "Database Architecture", relevance: "Primary" },
+      { name: "Multi-tenant Design", relevance: "Primary" },
+      { name: "Security Architecture", relevance: "Supporting" },
+      { name: "Capacity Planning", relevance: "Supporting" },
+    ],
+    estimatedMinutes: 10,
+    relevanceLabel: "Directly relevant to your schema design",
+    confidenceLabel: "High",
+    returnToTask: "Return to the schema panel and check which tables need a tenant_id column.",
+    fallbackUsed: true,
+  },
+  "Backup and disaster recovery": {
+    title: "Database backup and disaster recovery essentials",
+    contextSummary: "You are working with a production database. Having a tested backup and recovery strategy is essential before making schema changes or deploying new features.",
+    whyNow: "Database changes like adding indexes, enabling RLS, or modifying schemas carry risk. Knowing you can restore to a known good state gives you confidence to make changes safely.",
+    quickExplanation: "A solid backup strategy combines automated snapshots, point-in-time recovery (PITR), and tested restore procedures. The key is not just having backups, but knowing they work.",
+    steps: [
+      { title: "Check your current backup status", description: "Verify that automated backups are enabled. Check the retention period and last successful backup time.", type: "check" },
+      { title: "Understand PITR", description: "Point-in-Time Recovery lets you restore to any moment within your retention window using WAL archiving. More granular than daily snapshots.", type: "explain" },
+      { title: "Test a restore procedure", description: "Create a test branch or clone of your database from a backup. Verify the data is complete and your application connects correctly.", type: "do" },
+      { title: "Document your recovery plan", description: "Write down the exact steps to restore: who to contact, which tools to use, expected RTO and RPO.", type: "practice" },
+    ],
+    videos: [
+      { title: "PostgreSQL Backup and Recovery", url: "https://www.youtube.com/watch?v=kbCytSYPh0E", channel: "Crunchy Data", reason: "Comprehensive guide to pg_dump, pg_basebackup, and PITR", duration: "22 min", difficulty: "Intermediate" },
+      { title: "Database Disaster Recovery Planning", url: "https://www.youtube.com/results?search_query=database+disaster+recovery+planning+postgresql", channel: "Various", reason: "Talks on building reliable database recovery procedures", duration: "15-25 min", difficulty: "Intermediate" },
+      { title: "Supabase Database Backups Explained", url: "https://www.youtube.com/results?search_query=supabase+database+backups+point+in+time+recovery", channel: "Supabase", reason: "Platform-specific backup and restore workflows", duration: "10 min", difficulty: "Beginner" },
+    ],
+    docs: [
+      { title: "PostgreSQL Backup and Restore", url: "https://www.postgresql.org/docs/current/backup.html", source: "PostgreSQL Docs", summary: "Official guide covering SQL dump, file system level, and continuous archiving backup methods.", reason: "Canonical reference for all PostgreSQL backup strategies" },
+      { title: "Supabase Database Backups", url: "https://supabase.com/docs/guides/platform/backups", source: "Supabase", summary: "How to manage automated backups and perform restores.", reason: "Specific to your current database platform" },
+      { title: "RTO vs RPO Explained", url: "https://docs.aws.amazon.com/wellarchitected/latest/reliability-pillar/plan-for-disaster-recovery-dr.html", source: "AWS Well-Architected", summary: "Understanding Recovery Time and Recovery Point Objectives.", reason: "Framework for defining your backup requirements" },
+    ],
+    practiceTask: {
+      title: "Verify your backup configuration",
+      instruction: "Navigate to your database settings and confirm automated backups are enabled. Check the retention period and note the timestamp of the last successful backup.",
+      secondaryTasks: ["Take a manual backup using pg_dump before your next schema change", "Practice restoring a backup to a test environment", "Write a one-page disaster recovery runbook"],
+    },
+    roadmapTags: ["Production Readiness", "Operational Excellence", "Data Durability", "Risk Management", "Compliance"],
+    skillAreas: [
+      { name: "Database Operations", relevance: "Primary" },
+      { name: "Disaster Recovery", relevance: "Primary" },
+      { name: "Risk Management", relevance: "Supporting" },
+      { name: "Operational Awareness", relevance: "Supporting" },
+    ],
+    estimatedMinutes: 10,
+    relevanceLabel: "Important for your production database",
+    confidenceLabel: "High",
+    returnToTask: "Return to your database dashboard and verify backup status before continuing schema changes.",
+    fallbackUsed: true,
+  },
+}
+
+function getClientFallback(suggestionTitle: string): CoachingPlan | null {
+  for (const [prefix, plan] of Object.entries(CLIENT_FALLBACKS)) {
+    if (suggestionTitle.includes(prefix)) return plan
+  }
+  return null
+}
+
 // ── Size modes ──────────────────────────────────────────────────────────────
 type PanelSize = "compact" | "expanded" | "full"
 
@@ -185,7 +392,7 @@ function SectionHeader({ icon: Icon, title, color = "text-accent" }: { icon: typ
   )
 }
 
-// ── Video Card ──────────────────────────────────────────────────────────────
+// ── Video Card ───────────────────────────────────────────��──────────────────
 function VideoCard({ video, isExpanded }: { video: CoachingPlan["videos"][number]; isExpanded: boolean }) {
   return (
     <div className={`group/vid rounded-lg border border-border bg-card/60 hover:bg-card hover:border-chart-1/30 transition-all ${isExpanded ? "p-4" : "p-3"}`}>
@@ -518,6 +725,8 @@ export function AssistantPopup() {
         body: JSON.stringify({
           taskTitle: suggestion.title,
           taskType: suggestion.category,
+          suggestionDescription: suggestion.description,
+          sourceSignal: suggestion.relevance,
           currentPage: "Storage / Query Editor",
           triggerType: "contextual-suggestion",
           triggerReason: suggestion.relevance,
@@ -538,8 +747,14 @@ export function AssistantPopup() {
       if (!res.ok) throw new Error(`Server responded with ${res.status}`)
       const data = await res.json()
       setPlan(data.plan)
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to generate plan")
+    } catch {
+      // API failed — use client-side suggestion-specific fallback
+      const fallback = getClientFallback(suggestion.title)
+      if (fallback) {
+        setPlan(fallback)
+      } else {
+        setError("Failed to generate plan. Please try again.")
+      }
     } finally {
       setLoading(false)
     }
@@ -555,11 +770,15 @@ export function AssistantPopup() {
     return (
       <button
         onClick={() => setOpen(true)}
-        className="fixed bottom-6 right-6 z-50 flex items-center gap-2 px-4 py-2.5 rounded-full bg-accent text-accent-foreground shadow-lg shadow-accent/20 hover:scale-105 transition-transform"
+        className="fixed bottom-6 right-6 z-50 flex items-center gap-2.5 pl-2.5 pr-4 py-2 rounded-full bg-popover border border-border shadow-2xl shadow-black/40 hover:scale-105 transition-transform"
       >
-        <Sparkles className="w-4 h-4" />
-        <span className="text-sm font-medium">FlowState</span>
-        <span className="text-xs opacity-80">OFF</span>
+        <img
+          src="/flowstate-logo.jpg"
+          alt=""
+          className="w-6 h-6 rounded-md object-cover"
+        />
+        <span className="text-sm font-medium text-foreground">FlowState</span>
+        <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">OFF</span>
       </button>
     )
   }
@@ -584,9 +803,11 @@ export function AssistantPopup() {
     >
       {/* Header */}
       <div className="flex items-center gap-2.5 px-4 py-3 border-b border-border shrink-0 bg-popover">
-        <div className="w-7 h-7 rounded-lg bg-accent/15 flex items-center justify-center">
-          <Sparkles className="w-3.5 h-3.5 text-accent" />
-        </div>
+        <img
+          src="/flowstate-logo.jpg"
+          alt="FlowState"
+          className="w-7 h-7 rounded-lg object-cover"
+        />
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
             <h3 className="text-sm font-medium text-foreground">FlowState</h3>

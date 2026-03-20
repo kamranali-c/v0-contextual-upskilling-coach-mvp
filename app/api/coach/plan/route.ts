@@ -1,3 +1,6 @@
+// Coach plan API route — uses Vercel AI Gateway (zero-config for OpenAI)
+// Last updated to fix stale cache issue with old xai provider
+
 import { generateText, Output } from "ai"
 import { coachingPlanSchema, coachRequestSchema } from "@/lib/ai/schemas"
 import {
@@ -12,7 +15,6 @@ export async function POST(req: Request) {
   try {
     const body = await req.json()
 
-    // Validate input
     const parsed = coachRequestSchema.safeParse(body)
     if (!parsed.success) {
       return Response.json(
@@ -23,7 +25,9 @@ export async function POST(req: Request) {
 
     payload = parsed.data
 
-    // Call via Vercel AI Gateway (zero-config for OpenAI)
+    console.log("[v0] Coach plan request for:", payload.taskTitle)
+
+    // Use Vercel AI Gateway — zero config for OpenAI models
     const { output } = await generateText({
       model: "openai/gpt-4o-mini",
       system: COACH_SYSTEM_PROMPT,
@@ -37,18 +41,18 @@ export async function POST(req: Request) {
     })
 
     if (!output) {
-      console.warn(
-        "[coach/plan] Model returned no structured output, using fallback"
-      )
+      console.warn("[v0] Model returned no structured output, using fallback")
       return Response.json({ plan: getFallbackPlan(payload) })
     }
 
+    console.log("[v0] AI response generated for:", payload.taskTitle)
     return Response.json({ plan: output })
   } catch (error) {
-    console.error("[coach/plan] Error:", error)
+    console.error("[v0] Coach plan error:", error)
 
-    // Return fallback if we have the parsed payload
+    // Return suggestion-specific fallback if we have the parsed payload
     if (payload) {
+      console.log("[v0] Using server fallback for:", payload.taskTitle)
       return Response.json({ plan: getFallbackPlan(payload) })
     }
 
