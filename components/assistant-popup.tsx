@@ -260,7 +260,7 @@ function CoachDetail({
 
 // --- Main popup ---
 export function AssistantPopup() {
-  const [open, setOpen] = useState(true)
+  const [open, setOpen] = useState(false)
   const [minimized, setMinimized] = useState(false)
   const [selectedSuggestion, setSelectedSuggestion] = useState<Suggestion | null>(null)
   const [plan, setPlan] = useState<CoachingPlan | null>(null)
@@ -315,9 +315,11 @@ export function AssistantPopup() {
     return (
       <button
         onClick={() => setOpen(true)}
-        className="fixed bottom-6 right-6 z-50 w-12 h-12 rounded-full bg-accent text-accent-foreground flex items-center justify-center shadow-lg shadow-accent/20 hover:scale-105 transition-transform"
+        className="fixed bottom-6 right-6 z-50 flex items-center gap-2 px-4 py-2.5 rounded-full bg-accent text-accent-foreground shadow-lg shadow-accent/20 hover:scale-105 transition-transform"
       >
-        <Sparkles className="w-5 h-5" />
+        <Sparkles className="w-4 h-4" />
+        <span className="text-sm font-medium">FlowState</span>
+        <span className="text-xs opacity-80">OFF</span>
       </button>
     )
   }
@@ -336,14 +338,16 @@ export function AssistantPopup() {
           <Sparkles className="w-3.5 h-3.5 text-accent" />
         </div>
         <div className="flex-1 min-w-0">
-          <h3 className="text-sm font-medium text-foreground">Upskilling Coach</h3>
+          <div className="flex items-center gap-2">
+            <h3 className="text-sm font-medium text-foreground">FlowState</h3>
+            <span className="px-1.5 py-0.5 rounded text-[9px] font-semibold uppercase tracking-wider bg-success/20 text-success">
+              ON
+            </span>
+          </div>
           {!minimized && (
-            <div className="flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-success animate-pulse" />
-              <span className="text-[10px] text-muted-foreground">
-                Live suggestions
-              </span>
-            </div>
+            <span className="text-[10px] text-muted-foreground">
+              Upskilling Coach — Live suggestions
+            </span>
           )}
         </div>
         <div className="flex items-center gap-1">
