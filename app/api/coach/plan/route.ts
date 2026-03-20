@@ -1,5 +1,4 @@
 import { generateText, Output } from "ai"
-import { getGrokModel } from "@/lib/ai/xai"
 import { coachingPlanSchema, coachRequestSchema } from "@/lib/ai/schemas"
 import {
   COACH_SYSTEM_PROMPT,
@@ -24,15 +23,9 @@ export async function POST(req: Request) {
 
     payload = parsed.data
 
-    // Check for API key
-    if (!process.env.XAI_API_KEY) {
-      console.warn("[coach/plan] XAI_API_KEY missing, returning fallback")
-      return Response.json({ plan: getFallbackPlan(payload) })
-    }
-
-    // Call Grok via AI SDK with structured output
+    // Call via Vercel AI Gateway (zero-config for OpenAI)
     const { output } = await generateText({
-      model: getGrokModel(),
+      model: "openai/gpt-4o-mini",
       system: COACH_SYSTEM_PROMPT,
       output: Output.object({ schema: coachingPlanSchema }),
       messages: [
