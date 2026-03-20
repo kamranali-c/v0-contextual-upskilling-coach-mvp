@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect, useRef } from "react"
 import {
   Sparkles,
   X,
@@ -396,20 +396,25 @@ const USER_STATS = {
   ] as BadgeInfo[],
 }
 
-// ── Suggestion Card ──────���──────────────────────────────────────────────────
+// ── Suggestion Card ──────���────────────────────────────────────────��─────────
 function SuggestionCard({
   suggestion,
   onAskCoach,
+  index = 0,
 }: {
   suggestion: Suggestion
   onAskCoach: (suggestion: Suggestion) => void
+  index?: number
 }) {
   const [saved, setSaved] = useState(false)
   const style = categoryStyles[suggestion.category]
   const Icon = suggestion.icon
 
   return (
-    <div className="group rounded-lg border border-border bg-card/60 p-4 hover:bg-card transition-colors">
+    <div
+      className="group rounded-lg border border-border bg-card/60 p-4 hover:bg-card transition-all duration-500 ease-out animate-in fade-in slide-in-from-bottom-3"
+      style={{ animationDelay: `${index * 80}ms`, animationFillMode: "backwards" }}
+    >
       <div className="flex items-start gap-3">
         <div className="mt-0.5 w-7 h-7 rounded-lg flex items-center justify-center bg-secondary shrink-0">
           <Icon className={`w-4 h-4 ${style.color}`} />
@@ -1088,6 +1093,26 @@ export function AssistantPopup() {
   const [error, setError] = useState<string | null>(null)
   const [showProfile, setShowProfile] = useState(false)
 
+  // Animation state: tracks whether the panel has finished its entrance animation
+  const [panelVisible, setPanelVisible] = useState(false)
+  const animationFrameRef = useRef<number | null>(null)
+
+  useEffect(() => {
+    if (open) {
+      // Trigger entrance animation on next frame so the initial state renders first
+      animationFrameRef.current = requestAnimationFrame(() => {
+        animationFrameRef.current = requestAnimationFrame(() => {
+          setPanelVisible(true)
+        })
+      })
+    } else {
+      setPanelVisible(false)
+    }
+    return () => {
+      if (animationFrameRef.current) cancelAnimationFrame(animationFrameRef.current)
+    }
+  }, [open])
+
   const config = SIZE_CONFIG[panelSize]
 
   function togglePanelSize() {
@@ -1151,7 +1176,7 @@ export function AssistantPopup() {
     return (
       <button
         onClick={() => { setOpen(true); setPanelSize("expanded") }}
-        className="fixed bottom-6 right-6 z-50 flex items-center gap-2.5 pl-2.5 pr-4 py-2 rounded-full bg-popover border border-border shadow-2xl shadow-black/40 hover:scale-105 transition-transform"
+        className="fixed bottom-6 right-6 z-50 flex items-center gap-2.5 pl-2.5 pr-4 py-2 rounded-full bg-popover border border-border shadow-2xl shadow-black/40 hover:scale-105 transition-all duration-500 ease-out animate-in fade-in slide-in-from-bottom-2"
       >
         <img
           src="/flowstate-logo.jpg"
@@ -1168,16 +1193,21 @@ export function AssistantPopup() {
 
   return (
     <div
-      className={`fixed z-50 flex flex-col rounded-xl border border-border bg-popover shadow-2xl shadow-black/40 overflow-hidden transition-all duration-300 ease-in-out ${
+      className={`fixed z-50 flex flex-col rounded-xl border border-border bg-popover shadow-2xl shadow-black/40 overflow-hidden transition-all duration-500 ease-out ${
         isExpanded && !minimized
           ? "inset-x-0 mx-auto bottom-4"
           : "bottom-6 right-6"
+      } ${
+        panelVisible
+          ? "opacity-100 scale-100 translate-y-0"
+          : "opacity-0 scale-95 translate-y-4"
       }`}
       style={{
         width: isExpanded && !minimized ? undefined : (minimized ? 320 : 440),
         maxWidth: isExpanded && !minimized ? config.maxWidth : undefined,
         height: minimized ? "52px" : config.height,
         maxHeight: "calc(100vh - 32px)",
+        transformOrigin: isExpanded ? "center bottom" : "right bottom",
       }}
     >
       {/* Header */}
@@ -1283,8 +1313,8 @@ export function AssistantPopup() {
               <div className={`flex-1 overflow-y-auto p-4 ${
                 isExpanded ? "grid grid-cols-2 gap-3 auto-rows-min content-start" : "flex flex-col gap-2"
               }`}>
-                {SUGGESTIONS.map((s) => (
-                  <SuggestionCard key={s.id} suggestion={s} onAskCoach={handleAskCoach} />
+                {SUGGESTIONS.map((s, i) => (
+                  <SuggestionCard key={s.id} suggestion={s} onAskCoach={handleAskCoach} index={i} />
                 ))}
               </div>
 
