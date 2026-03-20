@@ -14,23 +14,23 @@ import {
   Terminal,
 } from "lucide-react"
 
-// --- Fake top nav bar (Vercel-style) ---
+// --- Fake top nav bar (Vercel-style, light) ---
 function TopNav() {
   return (
-    <header className="h-12 flex items-center border-b border-border px-4 gap-3 bg-background shrink-0 select-none">
+    <header className="h-12 flex items-center border-b border-neutral-200 px-4 gap-3 bg-white shrink-0 select-none">
       {/* Logo */}
       <svg
         viewBox="0 0 76 65"
-        className="h-4 w-4 fill-foreground"
+        className="h-4 w-4 fill-neutral-900"
         aria-hidden="true"
       >
         <path d="M37.5274 0L75.0548 65H0L37.5274 0Z" />
       </svg>
-      <span className="text-muted-foreground text-sm">/</span>
-      <span className="text-sm font-medium">Acme Corp</span>
-      <span className="text-muted-foreground text-sm">/</span>
-      <span className="text-sm font-medium">web-platform</span>
-      <ChevronDown className="w-3.5 h-3.5 text-muted-foreground" />
+      <span className="text-neutral-300 text-sm">/</span>
+      <span className="text-sm font-medium text-neutral-900">Acme Corp</span>
+      <span className="text-neutral-300 text-sm">/</span>
+      <span className="text-sm font-medium text-neutral-900">web-platform</span>
+      <ChevronDown className="w-3.5 h-3.5 text-neutral-400" />
 
       {/* Tabs */}
       <nav className="hidden md:flex items-center gap-1 ml-6 text-sm">
@@ -40,8 +40,8 @@ function TopNav() {
               key={tab}
               className={`px-3 py-1.5 rounded-md cursor-default transition-colors ${
                 tab === "Deployments"
-                  ? "text-foreground bg-secondary"
-                  : "text-muted-foreground hover:text-foreground"
+                  ? "text-neutral-900 bg-neutral-100"
+                  : "text-neutral-500 hover:text-neutral-900"
               }`}
             >
               {tab}
@@ -54,11 +54,11 @@ function TopNav() {
 
       {/* Right side */}
       <div className="flex items-center gap-3">
-        <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+        <div className="flex items-center gap-1.5 text-xs text-neutral-500">
           <GitBranch className="w-3.5 h-3.5" />
           <span className="font-mono">main</span>
         </div>
-        <div className="w-7 h-7 rounded-full bg-secondary flex items-center justify-center text-xs font-medium text-secondary-foreground">
+        <div className="w-7 h-7 rounded-full bg-neutral-900 flex items-center justify-center text-xs font-medium text-white">
           JD
         </div>
       </div>
@@ -66,7 +66,7 @@ function TopNav() {
   )
 }
 
-// --- File tree sidebar ---
+// --- File tree sidebar (light) ---
 function FileTree() {
   const items = [
     { type: "folder-open", name: "app", depth: 0 },
@@ -82,8 +82,8 @@ function FileTree() {
   ] as const
 
   return (
-    <aside className="hidden lg:flex w-52 flex-col border-r border-border bg-sidebar shrink-0 select-none overflow-y-auto">
-      <div className="px-3 py-2.5 text-xs font-medium text-muted-foreground uppercase tracking-wider">
+    <aside className="hidden lg:flex w-52 flex-col border-r border-neutral-200 bg-neutral-50 shrink-0 select-none overflow-y-auto">
+      <div className="px-3 py-2.5 text-xs font-medium text-neutral-400 uppercase tracking-wider">
         Explorer
       </div>
       <div className="flex flex-col text-sm">
@@ -99,8 +99,8 @@ function FileTree() {
               key={i}
               className={`flex items-center gap-2 px-3 py-1.5 cursor-default ${
                 "active" in item && item.active
-                  ? "bg-sidebar-accent text-foreground"
-                  : "text-muted-foreground hover:text-foreground hover:bg-sidebar-accent/50"
+                  ? "bg-blue-50 text-blue-700"
+                  : "text-neutral-500 hover:text-neutral-900 hover:bg-neutral-100"
               }`}
               style={{ paddingLeft: `${12 + item.depth * 16}px` }}
             >
@@ -114,7 +114,7 @@ function FileTree() {
   )
 }
 
-// --- Build log output ---
+// --- Build log output (light) ---
 function BuildLog() {
   const lines = [
     { time: "12:04:02", text: "Cloning github.com/acme/web-platform (Branch: main)", type: "info" },
@@ -136,41 +136,41 @@ function BuildLog() {
   ]
 
   return (
-    <div className="flex-1 overflow-y-auto bg-background">
+    <div className="flex-1 overflow-y-auto bg-white">
       {/* Deployment summary bar */}
-      <div className="flex items-center gap-4 px-5 py-3 border-b border-border">
+      <div className="flex items-center gap-4 px-5 py-3 border-b border-neutral-200">
         <div className="flex items-center gap-2">
-          <CheckCircle2 className="w-4 h-4 text-success" />
-          <span className="text-sm font-medium">Production Deployment</span>
+          <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+          <span className="text-sm font-medium text-neutral-900">Production Deployment</span>
         </div>
-        <span className="text-xs text-muted-foreground font-mono">dpl_8Kx2nQ4f</span>
-        <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+        <span className="text-xs text-neutral-400 font-mono">dpl_8Kx2nQ4f</span>
+        <div className="flex items-center gap-1.5 text-xs text-neutral-400">
           <Clock className="w-3 h-3" />
           <span>16s</span>
         </div>
         <div className="flex-1" />
-        <div className="hidden sm:flex items-center gap-1.5 text-xs text-accent cursor-default">
+        <div className="hidden sm:flex items-center gap-1.5 text-xs text-blue-600 cursor-default">
           <ExternalLink className="w-3 h-3" />
           <span>web-platform-acme.vercel.app</span>
         </div>
       </div>
 
       {/* Tabs */}
-      <div className="flex items-center gap-1 px-5 pt-3 text-sm border-b border-border">
+      <div className="flex items-center gap-1 px-5 pt-3 text-sm border-b border-neutral-200">
         {["Build Logs", "Runtime Logs", "Source"].map((tab) => (
           <span
             key={tab}
             className={`px-3 py-2 cursor-default border-b-2 transition-colors ${
               tab === "Build Logs"
-                ? "text-foreground border-foreground"
-                : "text-muted-foreground border-transparent"
+                ? "text-neutral-900 border-neutral-900"
+                : "text-neutral-400 border-transparent"
             }`}
           >
             {tab}
           </span>
         ))}
         <div className="flex-1" />
-        <button className="flex items-center gap-1.5 text-xs text-muted-foreground px-2 py-1 rounded hover:text-foreground transition-colors cursor-default">
+        <button className="flex items-center gap-1.5 text-xs text-neutral-400 px-2 py-1 rounded hover:text-neutral-700 transition-colors cursor-default">
           <RotateCw className="w-3 h-3" />
           Redeploy
         </button>
@@ -181,7 +181,7 @@ function BuildLog() {
         {lines.map((line, i) => (
           <div key={i} className="flex gap-3">
             {line.time && (
-              <span className="text-muted-foreground/50 shrink-0 w-16 select-none">
+              <span className="text-neutral-300 shrink-0 w-16 select-none">
                 {line.time}
               </span>
             )}
@@ -189,17 +189,17 @@ function BuildLog() {
             <span
               className={
                 line.type === "success"
-                  ? "text-success"
+                  ? "text-emerald-600"
                   : line.type === "dim"
-                    ? "text-muted-foreground/60"
-                    : "text-foreground/80"
+                    ? "text-neutral-400"
+                    : "text-neutral-700"
               }
             >
               {line.text}
             </span>
           </div>
         ))}
-        <div className="flex items-center gap-2 mt-2 text-muted-foreground/40">
+        <div className="flex items-center gap-2 mt-2 text-neutral-300">
           <Terminal className="w-3 h-3" />
           <span className="animate-pulse">{"_"}</span>
         </div>
@@ -208,7 +208,7 @@ function BuildLog() {
   )
 }
 
-// --- Deployment info sidebar ---
+// --- Deployment info sidebar (light) ---
 function DeploymentInfo() {
   const items = [
     { label: "Status", value: "Ready", accent: true },
@@ -223,18 +223,18 @@ function DeploymentInfo() {
   ]
 
   return (
-    <aside className="hidden xl:flex w-64 flex-col border-l border-border bg-card shrink-0 overflow-y-auto select-none">
-      <div className="px-4 py-3 border-b border-border">
-        <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+    <aside className="hidden xl:flex w-64 flex-col border-l border-neutral-200 bg-neutral-50 shrink-0 overflow-y-auto select-none">
+      <div className="px-4 py-3 border-b border-neutral-200">
+        <h3 className="text-xs font-medium text-neutral-400 uppercase tracking-wider">
           Deployment Details
         </h3>
       </div>
       <div className="flex flex-col p-4 gap-4">
         {items.map((item, i) => (
           <div key={i} className="flex flex-col gap-0.5">
-            <span className="text-xs text-muted-foreground">{item.label}</span>
+            <span className="text-xs text-neutral-400">{item.label}</span>
             <span
-              className={`text-sm font-mono ${item.accent ? "text-success" : "text-foreground/80"}`}
+              className={`text-sm font-mono ${item.accent ? "text-emerald-600" : "text-neutral-700"}`}
             >
               {item.value}
             </span>
@@ -243,18 +243,18 @@ function DeploymentInfo() {
       </div>
 
       {/* Domains */}
-      <div className="px-4 py-3 border-t border-border mt-auto">
-        <h4 className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-3">
+      <div className="px-4 py-3 border-t border-neutral-200 mt-auto">
+        <h4 className="text-xs font-medium text-neutral-400 uppercase tracking-wider mb-3">
           Domains
         </h4>
         <div className="flex flex-col gap-2 text-xs font-mono">
           <div className="flex items-center gap-2">
-            <Circle className="w-2 h-2 fill-success text-success" />
-            <span className="text-foreground/80">acme-web.vercel.app</span>
+            <Circle className="w-2 h-2 fill-emerald-500 text-emerald-500" />
+            <span className="text-neutral-600">acme-web.vercel.app</span>
           </div>
           <div className="flex items-center gap-2">
-            <Circle className="w-2 h-2 fill-success text-success" />
-            <span className="text-foreground/80">platform.acme.com</span>
+            <Circle className="w-2 h-2 fill-emerald-500 text-emerald-500" />
+            <span className="text-neutral-600">platform.acme.com</span>
           </div>
         </div>
       </div>
@@ -265,7 +265,7 @@ function DeploymentInfo() {
 // --- Full workspace ---
 export function FakeWorkspace() {
   return (
-    <div className="fixed inset-0 flex flex-col bg-background overflow-hidden select-none">
+    <div className="fixed inset-0 flex flex-col bg-white overflow-hidden select-none">
       <TopNav />
       <div className="flex flex-1 min-h-0">
         <FileTree />
