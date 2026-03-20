@@ -1,7 +1,8 @@
-import { dirname } from "path"
+import { dirname, resolve } from "path"
 import { fileURLToPath } from "url"
+import { realpathSync } from "fs"
 
-const __dirname = dirname(fileURLToPath(import.meta.url))
+const __dirname = realpathSync(dirname(fileURLToPath(import.meta.url)))
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
