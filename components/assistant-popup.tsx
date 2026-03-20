@@ -853,22 +853,24 @@ export function AssistantPopup() {
             </button>
           )}
           {/* Profile button */}
-          <button
-            onClick={() => {
-              setShowProfile(!showProfile)
-              setSelectedSuggestion(null)
-              setPlan(null)
-              setError(null)
-            }}
-            className={`w-6 h-6 rounded flex items-center justify-center transition-colors ${
-              showProfile
-                ? "bg-accent/20 text-accent"
-                : "text-muted-foreground hover:text-foreground hover:bg-secondary"
-            }`}
-            title="User Profile"
-          >
-            <User className="w-3.5 h-3.5" />
-          </button>
+          {!minimized && (
+            <button
+              onClick={() => {
+                setShowProfile(!showProfile)
+                setSelectedSuggestion(null)
+                setPlan(null)
+                setError(null)
+              }}
+              className={`w-6 h-6 rounded flex items-center justify-center transition-colors ${
+                showProfile
+                  ? "bg-accent/20 text-accent"
+                  : "text-muted-foreground hover:text-foreground hover:bg-secondary"
+              }`}
+              title="User Profile"
+            >
+              <User className="w-3.5 h-3.5" />
+            </button>
+          )}
           <button
             onClick={() => setMinimized(!minimized)}
             className="w-6 h-6 rounded flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
