@@ -99,6 +99,8 @@ export type CoachingPlan = z.infer<typeof coachingPlanSchema>
 export const coachRequestSchema = z.object({
   taskTitle: z.string(),
   taskType: z.string(),
+  suggestionDescription: z.string().describe("Full description of the suggestion the user clicked, explaining what it is and why it matters"),
+  sourceSignal: z.string().describe("What triggered this suggestion, e.g. 'RLS disabled on users table' or 'LEFT JOIN detected in query'"),
   currentPage: z.string(),
   triggerType: z.string(),
   triggerReason: z.string(),

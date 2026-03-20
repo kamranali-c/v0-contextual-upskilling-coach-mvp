@@ -185,7 +185,7 @@ function SectionHeader({ icon: Icon, title, color = "text-accent" }: { icon: typ
   )
 }
 
-// ── Video Card ──────────────────────────────────────────────────────────────
+// ── Video Card ───────────────────────────────────────────��──────────────────
 function VideoCard({ video, isExpanded }: { video: CoachingPlan["videos"][number]; isExpanded: boolean }) {
   return (
     <div className={`group/vid rounded-lg border border-border bg-card/60 hover:bg-card hover:border-chart-1/30 transition-all ${isExpanded ? "p-4" : "p-3"}`}>
@@ -518,6 +518,8 @@ export function AssistantPopup() {
         body: JSON.stringify({
           taskTitle: suggestion.title,
           taskType: suggestion.category,
+          suggestionDescription: suggestion.description,
+          sourceSignal: suggestion.relevance,
           currentPage: "Storage / Query Editor",
           triggerType: "contextual-suggestion",
           triggerReason: suggestion.relevance,

@@ -12,7 +12,6 @@ export async function POST(req: Request) {
   try {
     const body = await req.json()
 
-    // Validate input
     const parsed = coachRequestSchema.safeParse(body)
     if (!parsed.success) {
       return Response.json(
