@@ -1,4 +1,5 @@
-import { callGrok } from "@/lib/ai/xai"
+import { generateText, Output } from "ai"
+import { getGrokModel } from "@/lib/ai/xai"
 import { coachingPlanSchema, coachRequestSchema } from "@/lib/ai/schemas"
 import {
   COACH_SYSTEM_PROMPT,
@@ -12,6 +13,7 @@ export async function POST(req: Request) {
   try {
     const body = await req.json()
 
+    // Validate input
     const parsed = coachRequestSchema.safeParse(body)
     if (!parsed.success) {
       return Response.json(
@@ -22,36 +24,37 @@ export async function POST(req: Request) {
 
     payload = parsed.data
 
+    // Check for API key
     if (!process.env.XAI_API_KEY) {
       console.warn("[coach/plan] XAI_API_KEY missing, returning fallback")
       return Response.json({ plan: getFallbackPlan(payload) })
     }
 
-    // Call Grok directly and ask for JSON output
-    const rawResponse = await callGrok([
-      { role: "system", content: COACH_SYSTEM_PROMPT + "\n\nYou MUST respond with valid JSON only. No markdown, no code fences, no extra text." },
-      { role: "user", content: formatContextMessage(payload) },
-    ])
+    // Call Grok via AI SDK with structured output
+    const { output } = await generateText({
+      model: getGrokModel(),
+      system: COACH_SYSTEM_PROMPT,
+      output: Output.object({ schema: coachingPlanSchema }),
+      messages: [
+        {
+          role: "user",
+          content: formatContextMessage(payload),
+        },
+      ],
+    })
 
-    // Strip any markdown code fences if present
-    const cleaned = rawResponse
-      .replace(/^```(?:json)?\s*/i, "")
-      .replace(/\s*```\s*$/, "")
-      .trim()
-
-    // Parse and validate with Zod
-    const jsonParsed = JSON.parse(cleaned)
-    const validated = coachingPlanSchema.safeParse(jsonParsed)
-
-    if (!validated.success) {
-      console.warn("[coach/plan] Grok response failed schema validation:", validated.error.flatten())
+    if (!output) {
+      console.warn(
+        "[coach/plan] Model returned no structured output, using fallback"
+      )
       return Response.json({ plan: getFallbackPlan(payload) })
     }
 
-    return Response.json({ plan: validated.data })
+    return Response.json({ plan: output })
   } catch (error) {
     console.error("[coach/plan] Error:", error)
 
+    // Return fallback if we have the parsed payload
     if (payload) {
       return Response.json({ plan: getFallbackPlan(payload) })
     }
