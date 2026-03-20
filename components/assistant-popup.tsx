@@ -28,6 +28,15 @@ import {
   Zap,
   ArrowRight,
   GripVertical,
+  User,
+  Trophy,
+  Flame,
+  Award,
+  Database,
+  Code,
+  GitBranch,
+  Settings,
+  History,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import type { CoachingPlan } from "@/lib/ai/schemas"
@@ -314,6 +323,81 @@ const categoryStyles: Record<Suggestion["category"], { label: string; color: str
   resource:     { label: "Resource",      color: "text-chart-2" },
 }
 
+// ── User profile data ───────────────────────────────────────────────────────
+interface UserSkill {
+  name: string
+  level: number
+  maxLevel: number
+  category: string
+  icon: typeof Database
+}
+
+interface RecentTopic {
+  id: string
+  title: string
+  timestamp: Date
+  category: string
+  icon: typeof BookOpen
+  summary: string
+  keyPoints: string[]
+}
+
+interface BadgeInfo {
+  id: string
+  name: string
+  icon: typeof Zap
+  color: string
+  description: string
+  earnedDate: string
+  criteria: string
+}
+
+const USER_SKILLS: UserSkill[] = [
+  { name: "SQL Queries", level: 3, maxLevel: 5, category: "Database", icon: Database },
+  { name: "API Integration", level: 2, maxLevel: 5, category: "Backend", icon: Code },
+  { name: "Deployment", level: 4, maxLevel: 5, category: "DevOps", icon: GitBranch },
+  { name: "Security", level: 2, maxLevel: 5, category: "Security", icon: Shield },
+  { name: "Architecture", level: 1, maxLevel: 5, category: "Design", icon: Wrench },
+]
+
+const RECENT_TOPICS: RecentTopic[] = [
+  {
+    id: "rt1", title: "Row Level Security (RLS)", timestamp: new Date(Date.now() - 30 * 60 * 1000), category: "Security", icon: Shield,
+    summary: "Row Level Security (RLS) lets you control which rows in a database table a user can access. It acts as a fine-grained access filter applied directly at the database level, ensuring data isolation without relying solely on application logic.",
+    keyPoints: ["RLS policies are defined per-table using CREATE POLICY", "Policies can reference the current user via auth.uid()", "Always enable RLS on tables containing user data", "Test policies thoroughly with different user roles"],
+  },
+  {
+    id: "rt2", title: "SQL LEFT JOIN Patterns", timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000), category: "Database", icon: Database,
+    summary: "A LEFT JOIN returns all rows from the left table and matching rows from the right table. When there is no match, NULL values are returned for the right table columns. This is essential for queries where you need all records from one table regardless of matches.",
+    keyPoints: ["LEFT JOIN preserves all rows from the left table", "Use COALESCE to handle NULL values from unmatched rows", "Combine with WHERE clauses carefully to avoid filtering out NULLs", "Consider performance with large tables and add appropriate indexes"],
+  },
+  {
+    id: "rt3", title: "Production Deployment", timestamp: new Date(Date.now() - 24 * 60 * 60 * 1000), category: "DevOps", icon: GitBranch,
+    summary: "Deploying to production involves building your application, running migrations, setting environment variables, and configuring your hosting platform. Following a checklist approach reduces errors and downtime during releases.",
+    keyPoints: ["Always run database migrations before deploying new code", "Use environment variables for secrets, never hardcode them", "Set up health checks and monitoring for production services", "Implement rollback strategies for failed deployments"],
+  },
+  {
+    id: "rt4", title: "Environment Variables", timestamp: new Date(Date.now() - 48 * 60 * 60 * 1000), category: "Configuration", icon: Settings,
+    summary: "Environment variables store configuration values outside your codebase. They allow you to change application behaviour across environments (development, staging, production) without modifying code, and keep sensitive data like API keys secure.",
+    keyPoints: ["Never commit .env files to version control", "Use .env.local for local development overrides", "Prefix client-side variables with NEXT_PUBLIC_ in Next.js", "Validate required variables at application startup"],
+  },
+]
+
+const USER_STATS = {
+  name: "Alex Chen",
+  email: "alex.chen@company.com",
+  role: "Full Stack Developer",
+  creditsEarned: 145,
+  currentStreak: 3,
+  completedSessions: 12,
+  totalLearningMinutes: 47,
+  badges: [
+    { id: "b1", name: "Quick Learner", icon: Zap, color: "text-chart-4", description: "Awarded for completing your first 5 learning sessions in under a week. You dove right in and showed exceptional initiative.", earnedDate: "Mar 12, 2026", criteria: "Complete 5 sessions within 7 days" },
+    { id: "b2", name: "Database Pro", icon: Database, color: "text-chart-2", description: "Earned by reaching Level 3 in the SQL Queries skill tree. You have demonstrated a solid understanding of database fundamentals.", earnedDate: "Mar 18, 2026", criteria: "Reach Level 3 in any Database skill" },
+    { id: "b3", name: "Streak Master", icon: Flame, color: "text-warning", description: "Achieved by maintaining a learning streak of 3 or more consecutive days. Consistency is the key to mastery.", earnedDate: "Mar 20, 2026", criteria: "Maintain a 3+ day learning streak" },
+  ] as BadgeInfo[],
+}
+
 // ── Suggestion Card ─────────────────────────────────────────────────────────
 function SuggestionCard({
   suggestion,
@@ -460,6 +544,308 @@ function DocCard({ doc, isExpanded }: { doc: CoachingPlan["docs"][number]; isExp
       </div>
       <p className={`text-muted-foreground/80 mt-1.5 leading-relaxed ${isExpanded ? "text-[11px]" : "text-[10px]"}`}>{doc.summary}</p>
       <p className={`text-muted-foreground/60 mt-1 italic ${isExpanded ? "text-[10px]" : "text-[10px]"}`}>{doc.reason}</p>
+    </div>
+  )
+}
+
+// ── Skill Tree Item ─────────────────────────────────────────────────────────
+function SkillTreeItem({ skill }: { skill: UserSkill }) {
+  const Icon = skill.icon
+  const percentage = (skill.level / skill.maxLevel) * 100
+
+  return (
+    <div className="flex items-center gap-3 p-2.5 rounded-lg bg-secondary/40 hover:bg-secondary/60 transition-colors">
+      <div className="w-8 h-8 rounded-lg bg-accent/10 flex items-center justify-center shrink-0">
+        <Icon className="w-4 h-4 text-accent" />
+      </div>
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center justify-between mb-1">
+          <span className="text-xs font-medium text-foreground">{skill.name}</span>
+          <span className="text-[10px] text-muted-foreground">Lvl {skill.level}/{skill.maxLevel}</span>
+        </div>
+        <div className="h-1.5 rounded-full bg-border overflow-hidden">
+          <div
+            className="h-full rounded-full bg-accent transition-all duration-500"
+            style={{ width: `${percentage}%` }}
+          />
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ── Recent Topic Item ───────────────────────────────────────────────────────
+function RecentTopicItem({ topic, onClick }: { topic: RecentTopic; onClick: () => void }) {
+  const Icon = topic.icon
+  const timeAgo = getTimeAgo(topic.timestamp)
+
+  return (
+    <button
+      onClick={onClick}
+      className="w-full flex items-center gap-2.5 p-2 rounded-lg hover:bg-secondary/40 transition-colors cursor-pointer group text-left"
+    >
+      <div className="w-6 h-6 rounded flex items-center justify-center bg-secondary shrink-0">
+        <Icon className="w-3 h-3 text-muted-foreground group-hover:text-accent transition-colors" />
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className="text-xs text-foreground truncate">{topic.title}</p>
+        <p className="text-[10px] text-muted-foreground">{timeAgo}</p>
+      </div>
+      <ChevronRight className="w-3 h-3 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+    </button>
+  )
+}
+
+// ── Topic Detail View ───────────────────────────────────────────────────────
+function TopicDetailView({ topic, onBack }: { topic: RecentTopic; onBack: () => void }) {
+  const Icon = topic.icon
+
+  return (
+    <div className="flex flex-col h-full">
+      <div className="flex items-center justify-between px-4 pt-3 pb-2 border-b border-border bg-popover/80 shrink-0">
+        <button
+          onClick={onBack}
+          className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
+        >
+          <ChevronLeft className="w-3.5 h-3.5" />
+          Profile
+        </button>
+        <span className="text-[10px] px-2 py-0.5 rounded-full bg-secondary text-muted-foreground">{topic.category}</span>
+      </div>
+
+      <div className="flex-1 overflow-y-auto px-4 py-4">
+        {/* Topic header */}
+        <div className="flex items-start gap-3 mb-4">
+          <div className="w-10 h-10 rounded-xl bg-accent/15 flex items-center justify-center shrink-0">
+            <Icon className="w-5 h-5 text-accent" />
+          </div>
+          <div>
+            <h3 className="text-sm font-semibold text-foreground leading-snug">{topic.title}</h3>
+            <p className="text-[10px] text-muted-foreground mt-0.5">Reviewed {getTimeAgo(topic.timestamp)}</p>
+          </div>
+        </div>
+
+        {/* AI Summary */}
+        <div className="mb-4">
+          <div className="flex items-center gap-2 mb-2">
+            <Sparkles className="w-3.5 h-3.5 text-accent" />
+            <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">AI Summary</h4>
+          </div>
+          <p className="text-xs text-foreground/90 leading-relaxed">{topic.summary}</p>
+        </div>
+
+        {/* Key Takeaways */}
+        <div>
+          <div className="flex items-center gap-2 mb-2">
+            <Lightbulb className="w-3.5 h-3.5 text-chart-4" />
+            <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Key Takeaways</h4>
+          </div>
+          <div className="flex flex-col gap-2">
+            {topic.keyPoints.map((point, i) => (
+              <div key={i} className="flex items-start gap-2 p-2.5 rounded-lg bg-secondary/40">
+                <div className="w-4 h-4 rounded-full bg-accent/15 flex items-center justify-center shrink-0 mt-0.5">
+                  <span className="text-[9px] font-bold text-accent">{i + 1}</span>
+                </div>
+                <p className="text-xs text-foreground/80 leading-relaxed">{point}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ── Badge Modal ─────────────────────────────────────────────────────────────
+function BadgeModal({ badge, onClose }: { badge: BadgeInfo; onClose: () => void }) {
+  const BadgeIcon = badge.icon
+
+  return (
+    <div className="absolute inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm">
+      <div className="mx-4 w-full max-w-xs rounded-xl border border-border bg-popover shadow-lg overflow-hidden">
+        {/* Modal header */}
+        <div className="flex items-center justify-between px-4 py-3 border-b border-border">
+          <h4 className="text-xs font-semibold text-foreground">Badge Details</h4>
+          <button
+            onClick={onClose}
+            className="w-5 h-5 rounded flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
+          >
+            <X className="w-3 h-3" />
+          </button>
+        </div>
+
+        {/* Modal body */}
+        <div className="px-4 py-5 flex flex-col items-center text-center">
+          <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-3 ${
+            badge.color === "text-chart-4" ? "bg-chart-4/15" :
+            badge.color === "text-chart-2" ? "bg-chart-2/15" :
+            "bg-warning/15"
+          }`}>
+            <BadgeIcon className={`w-7 h-7 ${badge.color}`} />
+          </div>
+          <h3 className="text-sm font-semibold text-foreground mb-1">{badge.name}</h3>
+          <p className="text-[10px] text-muted-foreground mb-3">Earned {badge.earnedDate}</p>
+          <p className="text-xs text-foreground/80 leading-relaxed mb-4">{badge.description}</p>
+          <div className="w-full p-2.5 rounded-lg bg-secondary/40 border border-border">
+            <div className="flex items-center gap-1.5 justify-center">
+              <Target className="w-3 h-3 text-accent" />
+              <span className="text-[10px] font-medium text-muted-foreground">Criteria:</span>
+            </div>
+            <p className="text-[11px] text-foreground mt-1">{badge.criteria}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ── Time ago helper ─────────────────────────────────────────────────────────
+function getTimeAgo(date: Date): string {
+  const now = new Date()
+  const diffMs = now.getTime() - date.getTime()
+  const diffMins = Math.floor(diffMs / (1000 * 60))
+  const diffHours = Math.floor(diffMs / (1000 * 60 * 60))
+  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24))
+
+  if (diffMins < 60) return `${diffMins}m ago`
+  if (diffHours < 24) return `${diffHours}h ago`
+  return `${diffDays}d ago`
+}
+
+// ── User Profile View ───────────────────────────────────────────────────────
+function UserProfileView({
+  onBack,
+  panelSize,
+}: {
+  onBack: () => void
+  panelSize: PanelSize
+}) {
+  const isExpanded = panelSize !== "compact"
+  const [selectedTopic, setSelectedTopic] = useState<RecentTopic | null>(null)
+  const [selectedBadge, setSelectedBadge] = useState<BadgeInfo | null>(null)
+
+  // Show topic detail view when a recent topic is clicked
+  if (selectedTopic) {
+    return <TopicDetailView topic={selectedTopic} onBack={() => setSelectedTopic(null)} />
+  }
+
+  return (
+    <div className="relative flex flex-col h-full">
+      {/* Badge modal overlay */}
+      {selectedBadge && (
+        <BadgeModal badge={selectedBadge} onClose={() => setSelectedBadge(null)} />
+      )}
+
+      {/* Profile header */}
+      <div className="flex items-center justify-between px-4 pt-3 pb-2 border-b border-border bg-popover/80 shrink-0">
+        <button
+          onClick={onBack}
+          className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
+        >
+          <ChevronLeft className="w-3.5 h-3.5" />
+          Back
+        </button>
+        <button className="flex items-center gap-1 text-[10px] px-2 py-1 rounded-md border border-border bg-secondary/50 text-muted-foreground hover:text-foreground transition-colors">
+          <Settings className="w-3 h-3" />
+          Settings
+        </button>
+      </div>
+
+      <div className="flex-1 overflow-y-auto">
+        {/* User Info Section */}
+        <div className={`px-4 border-b border-border ${isExpanded ? "py-5" : "py-4"}`}>
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-12 h-12 rounded-xl bg-accent/15 flex items-center justify-center">
+              <User className="w-6 h-6 text-accent" />
+            </div>
+            <div>
+              <h3 className="text-sm font-semibold text-foreground">{USER_STATS.name}</h3>
+              <p className="text-xs text-muted-foreground">{USER_STATS.role}</p>
+              <p className="text-[10px] text-muted-foreground/70">{USER_STATS.email}</p>
+            </div>
+          </div>
+
+          {/* Stats Grid */}
+          <div className="grid grid-cols-2 gap-2">
+            <div className="flex items-center gap-2 p-2.5 rounded-lg bg-secondary/40">
+              <div className="w-8 h-8 rounded-lg bg-chart-4/15 flex items-center justify-center">
+                <Trophy className="w-4 h-4 text-chart-4" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-foreground">{USER_STATS.creditsEarned}</p>
+                <p className="text-[10px] text-muted-foreground">Credits</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 p-2.5 rounded-lg bg-secondary/40">
+              <div className="w-8 h-8 rounded-lg bg-warning/15 flex items-center justify-center">
+                <Flame className="w-4 h-4 text-warning" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-foreground">{USER_STATS.currentStreak}</p>
+                <p className="text-[10px] text-muted-foreground">Day Streak</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 p-2.5 rounded-lg bg-secondary/40">
+              <div className="w-8 h-8 rounded-lg bg-success/15 flex items-center justify-center">
+                <BookOpen className="w-4 h-4 text-success" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-foreground">{USER_STATS.completedSessions}</p>
+                <p className="text-[10px] text-muted-foreground">Sessions</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 p-2.5 rounded-lg bg-secondary/40">
+              <div className="w-8 h-8 rounded-lg bg-chart-2/15 flex items-center justify-center">
+                <Clock className="w-4 h-4 text-chart-2" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-foreground">{USER_STATS.totalLearningMinutes}</p>
+                <p className="text-[10px] text-muted-foreground">Minutes</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Badges Section */}
+        <div className={`px-4 border-b border-border ${isExpanded ? "py-5" : "py-4"}`}>
+          <SectionHeader icon={Award} title="Badges Earned" color="text-chart-4" />
+          <div className="flex flex-wrap gap-2">
+            {USER_STATS.badges.map((badge) => {
+              const BadgeIcon = badge.icon
+              return (
+                <button
+                  key={badge.id}
+                  onClick={() => setSelectedBadge(badge)}
+                  className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-secondary/40 border border-border hover:border-accent/30 hover:bg-secondary/60 transition-colors cursor-pointer"
+                >
+                  <BadgeIcon className={`w-3.5 h-3.5 ${badge.color}`} />
+                  <span className="text-[11px] font-medium text-foreground">{badge.name}</span>
+                </button>
+              )
+            })}
+          </div>
+        </div>
+
+        {/* Skill Tree Section */}
+        <div className={`px-4 border-b border-border ${isExpanded ? "py-5" : "py-4"}`}>
+          <SectionHeader icon={TrendingUp} title="Skill Tree" color="text-accent" />
+          <div className="flex flex-col gap-2">
+            {USER_SKILLS.map((skill) => (
+              <SkillTreeItem key={skill.name} skill={skill} />
+            ))}
+          </div>
+        </div>
+
+        {/* Recent Topics Section */}
+        <div className={`px-4 ${isExpanded ? "py-5" : "py-4"}`}>
+          <SectionHeader icon={History} title="Recent Topics" color="text-chart-2" />
+          <div className="flex flex-col gap-1">
+            {RECENT_TOPICS.map((topic) => (
+              <RecentTopicItem key={topic.id} topic={topic} onClick={() => setSelectedTopic(topic)} />
+            ))}
+          </div>
+        </div>
+      </div>
     </div>
   )
 }
@@ -702,8 +1088,9 @@ export function AssistantPopup() {
   const [plan, setPlan] = useState<CoachingPlan | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [showProfile, setShowProfile] = useState(false)
 
-  const isDetail = !!selectedSuggestion
+  const isDetail = !!selectedSuggestion || showProfile
   const config = SIZE_CONFIG[panelSize]
 
   function cyclePanelSize() {
@@ -817,7 +1204,7 @@ export function AssistantPopup() {
           </div>
           {!minimized && (
             <span className="text-[10px] text-muted-foreground">
-              {isDetail ? "Coaching response" : "Upskilling Coach — Live suggestions"}
+              {showProfile ? "User Profile" : selectedSuggestion ? "Coaching response" : "Upskilling Coach — Live suggestions"}
             </span>
           )}
         </div>
@@ -833,6 +1220,25 @@ export function AssistantPopup() {
               {sizeLabel[panelSize]}
             </button>
           )}
+          {/* Profile button */}
+          {!minimized && (
+            <button
+              onClick={() => {
+                setShowProfile(!showProfile)
+                setSelectedSuggestion(null)
+                setPlan(null)
+                setError(null)
+              }}
+              className={`w-6 h-6 rounded flex items-center justify-center transition-colors ${
+                showProfile
+                  ? "bg-accent/20 text-accent"
+                  : "text-muted-foreground hover:text-foreground hover:bg-secondary"
+              }`}
+              title="User Profile"
+            >
+              <User className="w-3.5 h-3.5" />
+            </button>
+          )}
           <button
             onClick={() => setMinimized(!minimized)}
             className="w-6 h-6 rounded flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
@@ -841,7 +1247,7 @@ export function AssistantPopup() {
             {minimized ? <Maximize2 className="w-3.5 h-3.5" /> : <Minus className="w-3.5 h-3.5" />}
           </button>
           <button
-            onClick={() => { setOpen(false); setPanelSize("compact") }}
+            onClick={() => { setOpen(false); setPanelSize("compact"); setShowProfile(false) }}
             className="w-6 h-6 rounded flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
             title="Close"
           >
@@ -853,7 +1259,12 @@ export function AssistantPopup() {
       {/* Body */}
       {!minimized && (
         <div className="flex-1 overflow-hidden flex flex-col min-h-0">
-          {selectedSuggestion ? (
+          {showProfile ? (
+            <UserProfileView
+              onBack={() => setShowProfile(false)}
+              panelSize={panelSize}
+            />
+          ) : selectedSuggestion ? (
             <CoachDetail
               suggestion={selectedSuggestion}
               plan={plan}
