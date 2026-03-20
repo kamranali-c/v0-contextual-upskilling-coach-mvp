@@ -252,7 +252,7 @@ type PanelSize = "compact" | "expanded"
 
 const SIZE_CONFIG: Record<PanelSize, { maxWidth: string; height: string }> = {
   compact:  { maxWidth: "440px", height: "540px" },
-  expanded: { maxWidth: "92%",   height: "calc(100vh - 64px)" },
+  expanded: { maxWidth: "50%",   height: "calc(100vh - 64px)" },
 }
 
 // ── Suggestion data ─────────────────────────────────────────────────────────
@@ -396,7 +396,7 @@ const USER_STATS = {
   ] as BadgeInfo[],
 }
 
-// ── Suggestion Card ──────���────────────────────────────────────────��─────────
+// ── Suggestion Card ──────���──────────────────────────────────���─────��─────────
 function SuggestionCard({
   suggestion,
   onAskCoach,
@@ -551,7 +551,7 @@ function DocCard({ doc, isExpanded }: { doc: CoachingPlan["docs"][number]; isExp
   )
 }
 
-// ── Skill Tree Item ─────────────────────────────────────────────────────────
+// ── Skill Tree Item ─────────────────────────────────────��───────────────────
 function SkillTreeItem({ skill }: { skill: UserSkill }) {
   const Icon = skill.icon
   const percentage = (skill.level / skill.maxLevel) * 100
@@ -1084,7 +1084,7 @@ function CoachDetail({
 
 // ── Main popup ──────────────────────────────────────────────────────────────
 export function AssistantPopup() {
-  const [open, setOpen] = useState(true)
+  const [open, setOpen] = useState(false)
   const [minimized, setMinimized] = useState(false)
   const [panelSize, setPanelSize] = useState<PanelSize>("expanded")
   const [selectedSuggestion, setSelectedSuggestion] = useState<Suggestion | null>(null)
