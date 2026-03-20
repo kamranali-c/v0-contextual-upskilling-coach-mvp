@@ -1195,7 +1195,7 @@ export function AssistantPopup() {
     <div
       className={`fixed z-50 flex flex-col rounded-xl border border-border bg-popover shadow-2xl shadow-black/40 overflow-hidden transition-all duration-500 ease-out ${
         isExpanded && !minimized
-          ? "inset-x-0 mx-auto bottom-4"
+          ? "right-4 bottom-4"
           : "bottom-6 right-6"
       } ${
         panelVisible
