@@ -23,40 +23,65 @@ import {
   RefreshCw,
 } from "lucide-react"
 
-// --- Fake top nav bar (Vercel-style) ---
+// ── Light theme inline colors ──────────────────────────────────────────────
+// The global CSS uses dark tokens. The workspace uses hardcoded light colors
+// so the dark FlowState popup creates strong visual contrast.
+const L = {
+  bg: "#fafafa",
+  bgAlt: "#ffffff",
+  bgSidebar: "#f5f5f5",
+  bgHover: "#f0f0f0",
+  bgActive: "#eaeaff",
+  bgAccent: "#e8f4f8",
+  bgAccentSoft: "#dff0f5",
+  bgSuccess: "#e6f9ee",
+  bgWarning: "#fff8e6",
+  bgCard: "#ffffff",
+  border: "#e5e5e5",
+  borderSoft: "#eeeeee",
+  text: "#171717",
+  textSecondary: "#525252",
+  textMuted: "#a3a3a3",
+  textAccent: "#0d9488",
+  textWarning: "#d97706",
+  textSuccess: "#16a34a",
+  textLink: "#0ea5e9",
+  textYellow: "#ca8a04",
+  shadow: "0 1px 3px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.03)",
+} as const
+
+// --- Fake top nav bar (light Vercel-style) ---
 function TopNav() {
   return (
-    <header className="h-12 flex items-center border-b border-border px-4 gap-3 bg-background shrink-0 select-none">
+    <header
+      className="h-12 flex items-center px-4 gap-3 shrink-0 select-none"
+      style={{ background: L.bgCard, borderBottom: `1px solid ${L.border}`, color: L.text }}
+    >
       {/* Logo */}
-      <svg
-        viewBox="0 0 76 65"
-        className="h-4 w-4 fill-foreground"
-        aria-hidden="true"
-      >
+      <svg viewBox="0 0 76 65" className="h-4 w-4" aria-hidden="true" style={{ fill: L.text }}>
         <path d="M37.5274 0L75.0548 65H0L37.5274 0Z" />
       </svg>
-      <span className="text-muted-foreground text-sm">/</span>
-      <span className="text-sm font-medium">Acme Corp</span>
-      <span className="text-muted-foreground text-sm">/</span>
-      <span className="text-sm font-medium">customer-portal</span>
-      <ChevronDown className="w-3.5 h-3.5 text-muted-foreground" />
+      <span style={{ color: L.textMuted }} className="text-sm">/</span>
+      <span className="text-sm font-medium" style={{ color: L.text }}>Acme Corp</span>
+      <span style={{ color: L.textMuted }} className="text-sm">/</span>
+      <span className="text-sm font-medium" style={{ color: L.text }}>customer-portal</span>
+      <ChevronDown className="w-3.5 h-3.5" style={{ color: L.textMuted }} />
 
       {/* Tabs */}
       <nav className="hidden md:flex items-center gap-1 ml-6 text-sm">
-        {["Project", "Deployments", "Analytics", "Storage", "Settings"].map(
-          (tab) => (
-            <span
-              key={tab}
-              className={`px-3 py-1.5 rounded-md cursor-default transition-colors ${
-                tab === "Storage"
-                  ? "text-foreground bg-secondary"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              {tab}
-            </span>
-          )
-        )}
+        {["Project", "Deployments", "Analytics", "Storage", "Settings"].map((tab) => (
+          <span
+            key={tab}
+            className="px-3 py-1.5 rounded-md cursor-default transition-colors"
+            style={{
+              color: tab === "Storage" ? L.text : L.textSecondary,
+              background: tab === "Storage" ? L.bgHover : "transparent",
+              fontWeight: tab === "Storage" ? 500 : 400,
+            }}
+          >
+            {tab}
+          </span>
+        ))}
       </nav>
 
       <div className="flex-1" />
@@ -64,10 +89,18 @@ function TopNav() {
       {/* Right side */}
       <div className="flex items-center gap-3">
         <div className="hidden sm:flex items-center gap-2 text-xs">
-          <span className="text-muted-foreground">Hobby</span>
-          <span className="px-1.5 py-0.5 rounded bg-accent/20 text-accent text-[10px] font-medium">Upgrade</span>
+          <span style={{ color: L.textMuted }}>Hobby</span>
+          <span
+            className="px-1.5 py-0.5 rounded text-[10px] font-medium"
+            style={{ background: L.bgAccent, color: L.textAccent }}
+          >
+            Upgrade
+          </span>
         </div>
-        <div className="w-7 h-7 rounded-full bg-secondary flex items-center justify-center text-xs font-medium text-secondary-foreground">
+        <div
+          className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-medium"
+          style={{ background: L.bgHover, color: L.textSecondary }}
+        >
           SJ
         </div>
       </div>
@@ -75,8 +108,14 @@ function TopNav() {
   )
 }
 
-// --- Storage sidebar ---
-function StorageSidebar({ activeTable, onTableSelect }: { activeTable: string; onTableSelect: (table: string) => void }) {
+// --- Storage sidebar (light) ---
+function StorageSidebar({
+  activeTable,
+  onTableSelect,
+}: {
+  activeTable: string
+  onTableSelect: (table: string) => void
+}) {
   const tables = [
     { name: "users", rows: 1284 },
     { name: "orders", rows: 5621 },
@@ -86,40 +125,54 @@ function StorageSidebar({ activeTable, onTableSelect }: { activeTable: string; o
   ]
 
   return (
-    <aside className="hidden lg:flex w-60 flex-col border-r border-border bg-sidebar shrink-0 select-none overflow-y-auto">
+    <aside
+      className="hidden lg:flex w-60 flex-col shrink-0 select-none overflow-y-auto"
+      style={{ background: L.bgSidebar, borderRight: `1px solid ${L.border}` }}
+    >
       {/* Database header */}
-      <div className="px-3 py-3 border-b border-border">
+      <div className="px-3 py-3" style={{ borderBottom: `1px solid ${L.border}` }}>
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-md bg-accent/20 flex items-center justify-center">
-            <Database className="w-4 h-4 text-accent" />
+          <div
+            className="w-8 h-8 rounded-md flex items-center justify-center"
+            style={{ background: L.bgAccent }}
+          >
+            <Database className="w-4 h-4" style={{ color: L.textAccent }} />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium truncate">customer-db</p>
-            <p className="text-[10px] text-muted-foreground">PostgreSQL 15</p>
+            <p className="text-sm font-medium truncate" style={{ color: L.text }}>customer-db</p>
+            <p className="text-[10px]" style={{ color: L.textMuted }}>PostgreSQL 15</p>
           </div>
-          <button className="w-6 h-6 rounded flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors">
+          <button
+            className="w-6 h-6 rounded flex items-center justify-center transition-colors"
+            style={{ color: L.textMuted }}
+          >
             <Settings className="w-3.5 h-3.5" />
           </button>
         </div>
       </div>
 
       {/* Quick stats */}
-      <div className="px-3 py-2.5 border-b border-border grid grid-cols-2 gap-2 text-center">
-        <div className="p-2 rounded bg-secondary/50">
-          <p className="text-[10px] text-muted-foreground">Tables</p>
-          <p className="text-sm font-medium">5</p>
+      <div
+        className="px-3 py-2.5 grid grid-cols-2 gap-2 text-center"
+        style={{ borderBottom: `1px solid ${L.border}` }}
+      >
+        <div className="p-2 rounded" style={{ background: L.bgCard }}>
+          <p className="text-[10px]" style={{ color: L.textMuted }}>Tables</p>
+          <p className="text-sm font-medium" style={{ color: L.text }}>5</p>
         </div>
-        <div className="p-2 rounded bg-secondary/50">
-          <p className="text-[10px] text-muted-foreground">Size</p>
-          <p className="text-sm font-medium">24 MB</p>
+        <div className="p-2 rounded" style={{ background: L.bgCard }}>
+          <p className="text-[10px]" style={{ color: L.textMuted }}>Size</p>
+          <p className="text-sm font-medium" style={{ color: L.text }}>24 MB</p>
         </div>
       </div>
 
       {/* Tables list */}
       <div className="flex-1 py-2">
         <div className="px-3 py-1.5 flex items-center justify-between">
-          <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Tables</span>
-          <button className="w-5 h-5 rounded flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors">
+          <span className="text-[10px] font-medium uppercase tracking-wider" style={{ color: L.textMuted }}>
+            Tables
+          </span>
+          <button className="w-5 h-5 rounded flex items-center justify-center" style={{ color: L.textMuted }}>
             <Plus className="w-3 h-3" />
           </button>
         </div>
@@ -128,33 +181,37 @@ function StorageSidebar({ activeTable, onTableSelect }: { activeTable: string; o
             <button
               key={table.name}
               onClick={() => onTableSelect(table.name)}
-              className={`flex items-center gap-2 px-3 py-2 text-sm transition-colors ${
-                activeTable === table.name
-                  ? "bg-sidebar-accent text-foreground"
-                  : "text-muted-foreground hover:text-foreground hover:bg-sidebar-accent/50"
-              }`}
+              className="flex items-center gap-2 px-3 py-2 text-sm transition-colors"
+              style={{
+                color: activeTable === table.name ? L.text : L.textSecondary,
+                background: activeTable === table.name ? L.bgActive : "transparent",
+                fontWeight: activeTable === table.name ? 500 : 400,
+              }}
             >
-              <Table className="w-3.5 h-3.5 shrink-0" />
+              <Table className="w-3.5 h-3.5 shrink-0" style={{ color: activeTable === table.name ? L.textAccent : L.textMuted }} />
               <span className="font-mono text-xs truncate flex-1 text-left">{table.name}</span>
-              <span className="text-[10px] text-muted-foreground">{table.rows.toLocaleString()}</span>
+              <span className="text-[10px]" style={{ color: L.textMuted }}>{table.rows.toLocaleString()}</span>
             </button>
           ))}
         </div>
       </div>
 
       {/* Connection info */}
-      <div className="px-3 py-3 border-t border-border">
-        <button className="w-full flex items-center gap-2 px-2.5 py-2 rounded-md bg-secondary/50 hover:bg-secondary transition-colors text-left">
-          <Key className="w-3.5 h-3.5 text-muted-foreground" />
-          <span className="text-xs text-muted-foreground">Connection String</span>
-          <ChevronRight className="w-3 h-3 text-muted-foreground ml-auto" />
+      <div className="px-3 py-3" style={{ borderTop: `1px solid ${L.border}` }}>
+        <button
+          className="w-full flex items-center gap-2 px-2.5 py-2 rounded-md transition-colors text-left"
+          style={{ background: L.bgCard, border: `1px solid ${L.borderSoft}` }}
+        >
+          <Key className="w-3.5 h-3.5" style={{ color: L.textMuted }} />
+          <span className="text-xs" style={{ color: L.textSecondary }}>Connection String</span>
+          <ChevronRight className="w-3 h-3 ml-auto" style={{ color: L.textMuted }} />
         </button>
       </div>
     </aside>
   )
 }
 
-// --- SQL Query Editor ---
+// --- SQL Query Editor (light) ---
 function QueryEditor({ onRun, running }: { onRun: () => void; running: boolean }) {
   const [query, setQuery] = useState(`SELECT 
   u.id,
@@ -168,28 +225,33 @@ ORDER BY order_count DESC
 LIMIT 10;`)
 
   return (
-    <div className="border-b border-border">
+    <div style={{ borderBottom: `1px solid ${L.border}` }}>
       {/* Editor toolbar */}
-      <div className="flex items-center justify-between px-4 py-2 bg-secondary/30 border-b border-border">
+      <div
+        className="flex items-center justify-between px-4 py-2"
+        style={{ background: L.bgSidebar, borderBottom: `1px solid ${L.border}` }}
+      >
         <div className="flex items-center gap-2">
-          <span className="text-xs font-medium text-foreground">Query Editor</span>
-          <span className="text-[10px] text-muted-foreground px-1.5 py-0.5 rounded bg-secondary">SQL</span>
+          <span className="text-xs font-medium" style={{ color: L.text }}>Query Editor</span>
+          <span
+            className="text-[10px] px-1.5 py-0.5 rounded"
+            style={{ background: L.bgHover, color: L.textSecondary }}
+          >
+            SQL
+          </span>
         </div>
         <div className="flex items-center gap-2">
-          <button className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors">
+          <button className="flex items-center gap-1.5 text-xs transition-colors" style={{ color: L.textMuted }}>
             <HelpCircle className="w-3 h-3" />
             <span className="hidden sm:inline">Help</span>
           </button>
           <button
             onClick={onRun}
             disabled={running}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-accent text-accent-foreground text-xs font-medium hover:bg-accent/90 transition-colors disabled:opacity-50"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors disabled:opacity-50"
+            style={{ background: L.textAccent, color: "#ffffff" }}
           >
-            {running ? (
-              <Loader2 className="w-3 h-3 animate-spin" />
-            ) : (
-              <Play className="w-3 h-3" />
-            )}
+            {running ? <Loader2 className="w-3 h-3 animate-spin" /> : <Play className="w-3 h-3" />}
             <span>{running ? "Running..." : "Run Query"}</span>
           </button>
         </div>
@@ -200,10 +262,11 @@ LIMIT 10;`)
         <textarea
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          className="w-full h-36 p-4 font-mono text-xs bg-background text-foreground resize-none focus:outline-none leading-relaxed"
+          className="w-full h-36 p-4 font-mono text-xs resize-none focus:outline-none leading-relaxed"
+          style={{ background: L.bgCard, color: L.text }}
           spellCheck={false}
         />
-        <div className="absolute bottom-2 right-3 flex items-center gap-2 text-[10px] text-muted-foreground">
+        <div className="absolute bottom-2 right-3 flex items-center gap-2 text-[10px]" style={{ color: L.textMuted }}>
           <span>Ln 10, Col 1</span>
           <span>|</span>
           <span>UTF-8</span>
@@ -213,7 +276,7 @@ LIMIT 10;`)
   )
 }
 
-// --- Results Table ---
+// --- Results Table (light) ---
 function ResultsTable({ loading }: { loading: boolean }) {
   const [copied, setCopied] = useState(false)
 
@@ -233,33 +296,42 @@ function ResultsTable({ loading }: { loading: boolean }) {
 
   if (loading) {
     return (
-      <div className="flex-1 flex items-center justify-center">
+      <div className="flex-1 flex items-center justify-center" style={{ background: L.bgCard }}>
         <div className="flex flex-col items-center gap-3">
-          <Loader2 className="w-6 h-6 text-accent animate-spin" />
-          <p className="text-xs text-muted-foreground">Executing query...</p>
+          <Loader2 className="w-6 h-6 animate-spin" style={{ color: L.textAccent }} />
+          <p className="text-xs" style={{ color: L.textMuted }}>Executing query...</p>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="flex-1 flex flex-col min-h-0">
+    <div className="flex-1 flex flex-col min-h-0" style={{ background: L.bgCard }}>
       {/* Results header */}
-      <div className="flex items-center justify-between px-4 py-2.5 bg-secondary/30 border-b border-border shrink-0">
+      <div
+        className="flex items-center justify-between px-4 py-2.5 shrink-0"
+        style={{ background: L.bgSidebar, borderBottom: `1px solid ${L.border}` }}
+      >
         <div className="flex items-center gap-3">
-          <span className="text-xs font-medium text-foreground">Results</span>
-          <span className="text-[10px] text-success px-1.5 py-0.5 rounded bg-success/10">5 rows</span>
-          <span className="text-[10px] text-muted-foreground">in 42ms</span>
+          <span className="text-xs font-medium" style={{ color: L.text }}>Results</span>
+          <span
+            className="text-[10px] px-1.5 py-0.5 rounded"
+            style={{ background: L.bgSuccess, color: L.textSuccess }}
+          >
+            5 rows
+          </span>
+          <span className="text-[10px]" style={{ color: L.textMuted }}>in 42ms</span>
         </div>
         <div className="flex items-center gap-2">
-          <button className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors">
+          <button className="flex items-center gap-1 text-xs transition-colors" style={{ color: L.textMuted }}>
             <RefreshCw className="w-3 h-3" />
           </button>
           <button
             onClick={handleCopy}
-            className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
+            className="flex items-center gap-1 text-xs transition-colors"
+            style={{ color: copied ? L.textSuccess : L.textMuted }}
           >
-            {copied ? <Check className="w-3 h-3 text-success" /> : <Copy className="w-3 h-3" />}
+            {copied ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
             <span>{copied ? "Copied" : "Copy"}</span>
           </button>
         </div>
@@ -268,12 +340,13 @@ function ResultsTable({ loading }: { loading: boolean }) {
       {/* Table */}
       <div className="flex-1 overflow-auto">
         <table className="w-full text-xs">
-          <thead className="sticky top-0 bg-card">
-            <tr className="border-b border-border">
+          <thead style={{ background: L.bgSidebar }}>
+            <tr style={{ borderBottom: `1px solid ${L.border}` }}>
               {columns.map((col) => (
                 <th
                   key={col}
-                  className="text-left px-4 py-2.5 font-medium text-muted-foreground font-mono"
+                  className="text-left px-4 py-2.5 font-medium font-mono"
+                  style={{ color: L.textSecondary }}
                 >
                   {col}
                 </th>
@@ -284,12 +357,12 @@ function ResultsTable({ loading }: { loading: boolean }) {
             {rows.map((row, i) => (
               <tr
                 key={i}
-                className="border-b border-border/50 hover:bg-secondary/30 transition-colors"
+                style={{ borderBottom: `1px solid ${L.borderSoft}` }}
               >
-                <td className="px-4 py-2.5 text-accent">{row.id}</td>
-                <td className="px-4 py-2.5 text-foreground">{row.email}</td>
-                <td className="px-4 py-2.5 text-muted-foreground">{row.created_at}</td>
-                <td className="px-4 py-2.5 text-foreground">{row.order_count}</td>
+                <td className="px-4 py-2.5" style={{ color: L.textAccent }}>{row.id}</td>
+                <td className="px-4 py-2.5" style={{ color: L.text }}>{row.email}</td>
+                <td className="px-4 py-2.5" style={{ color: L.textMuted }}>{row.created_at}</td>
+                <td className="px-4 py-2.5" style={{ color: L.text }}>{row.order_count}</td>
               </tr>
             ))}
           </tbody>
@@ -299,7 +372,7 @@ function ResultsTable({ loading }: { loading: boolean }) {
   )
 }
 
-// --- Schema panel ---
+// --- Schema panel (light) ---
 function SchemaPanel({ table }: { table: string }) {
   const schemas: Record<string, { name: string; type: string; nullable: boolean; primary?: boolean }[]> = {
     users: [
@@ -339,12 +412,18 @@ function SchemaPanel({ table }: { table: string }) {
   const columns = schemas[table] || schemas.users
 
   return (
-    <aside className="hidden xl:flex w-72 flex-col border-l border-border bg-card shrink-0 overflow-y-auto select-none">
-      <div className="px-4 py-3 border-b border-border flex items-center justify-between">
-        <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+    <aside
+      className="hidden xl:flex w-72 flex-col shrink-0 overflow-y-auto select-none"
+      style={{ background: L.bgCard, borderLeft: `1px solid ${L.border}` }}
+    >
+      <div
+        className="px-4 py-3 flex items-center justify-between"
+        style={{ borderBottom: `1px solid ${L.border}` }}
+      >
+        <h3 className="text-xs font-medium uppercase tracking-wider" style={{ color: L.textMuted }}>
           Schema: {table}
         </h3>
-        <button className="w-6 h-6 rounded flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors">
+        <button className="w-6 h-6 rounded flex items-center justify-center" style={{ color: L.textMuted }}>
           <MoreHorizontal className="w-3.5 h-3.5" />
         </button>
       </div>
@@ -352,26 +431,27 @@ function SchemaPanel({ table }: { table: string }) {
       {/* Columns */}
       <div className="p-3">
         <div className="flex items-center gap-2 mb-2">
-          <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Columns</span>
-          <span className="text-[10px] text-muted-foreground">({columns.length})</span>
+          <span className="text-[10px] font-medium uppercase tracking-wider" style={{ color: L.textMuted }}>
+            Columns
+          </span>
+          <span className="text-[10px]" style={{ color: L.textMuted }}>({columns.length})</span>
         </div>
         <div className="flex flex-col gap-1">
           {columns.map((col) => (
             <div
               key={col.name}
-              className="flex items-center gap-2 px-2.5 py-2 rounded bg-secondary/50 hover:bg-secondary transition-colors"
+              className="flex items-center gap-2 px-2.5 py-2 rounded transition-colors"
+              style={{ background: L.bgSidebar }}
             >
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-1.5">
-                  <span className="font-mono text-xs text-foreground">{col.name}</span>
-                  {col.primary && (
-                    <Key className="w-3 h-3 text-chart-4" />
-                  )}
+                  <span className="font-mono text-xs" style={{ color: L.text }}>{col.name}</span>
+                  {col.primary && <Key className="w-3 h-3" style={{ color: L.textYellow }} />}
                 </div>
                 <div className="flex items-center gap-1.5 mt-0.5">
-                  <span className="text-[10px] text-accent font-mono">{col.type}</span>
+                  <span className="text-[10px] font-mono" style={{ color: L.textAccent }}>{col.type}</span>
                   {!col.nullable && (
-                    <span className="text-[10px] text-muted-foreground">NOT NULL</span>
+                    <span className="text-[10px]" style={{ color: L.textMuted }}>NOT NULL</span>
                   )}
                 </div>
               </div>
@@ -383,33 +463,43 @@ function SchemaPanel({ table }: { table: string }) {
       {/* Indexes */}
       <div className="px-3 pb-3">
         <div className="flex items-center gap-2 mb-2">
-          <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Indexes</span>
+          <span className="text-[10px] font-medium uppercase tracking-wider" style={{ color: L.textMuted }}>
+            Indexes
+          </span>
         </div>
         <div className="flex flex-col gap-1">
-          <div className="flex items-center gap-2 px-2.5 py-2 rounded bg-secondary/50">
-            <Zap className="w-3 h-3 text-chart-4 shrink-0" />
-            <span className="font-mono text-[11px] text-foreground truncate">{table}_pkey</span>
+          <div className="flex items-center gap-2 px-2.5 py-2 rounded" style={{ background: L.bgSidebar }}>
+            <Zap className="w-3 h-3 shrink-0" style={{ color: L.textYellow }} />
+            <span className="font-mono text-[11px] truncate" style={{ color: L.text }}>{table}_pkey</span>
           </div>
           {table === "users" && (
-            <div className="flex items-center gap-2 px-2.5 py-2 rounded bg-secondary/50">
-              <Zap className="w-3 h-3 text-accent shrink-0" />
-              <span className="font-mono text-[11px] text-foreground truncate">users_email_idx</span>
+            <div className="flex items-center gap-2 px-2.5 py-2 rounded" style={{ background: L.bgSidebar }}>
+              <Zap className="w-3 h-3 shrink-0" style={{ color: L.textAccent }} />
+              <span className="font-mono text-[11px] truncate" style={{ color: L.text }}>users_email_idx</span>
             </div>
           )}
         </div>
       </div>
 
       {/* RLS */}
-      <div className="px-3 py-3 border-t border-border mt-auto">
+      <div className="px-3 py-3 mt-auto" style={{ borderTop: `1px solid ${L.border}` }}>
         <div className="flex items-center gap-2 mb-2">
-          <Shield className="w-3.5 h-3.5 text-muted-foreground" />
-          <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Row Level Security</span>
+          <Shield className="w-3.5 h-3.5" style={{ color: L.textMuted }} />
+          <span className="text-[10px] font-medium uppercase tracking-wider" style={{ color: L.textMuted }}>
+            Row Level Security
+          </span>
         </div>
-        <div className="flex items-center gap-2 px-2.5 py-2 rounded bg-warning/10 border border-warning/20">
-          <AlertCircle className="w-3.5 h-3.5 text-warning shrink-0" />
-          <span className="text-[11px] text-warning">RLS not enabled</span>
+        <div
+          className="flex items-center gap-2 px-2.5 py-2 rounded"
+          style={{ background: L.bgWarning, border: `1px solid #fde68a` }}
+        >
+          <AlertCircle className="w-3.5 h-3.5 shrink-0" style={{ color: L.textWarning }} />
+          <span className="text-[11px]" style={{ color: L.textWarning }}>RLS not enabled</span>
         </div>
-        <button className="w-full mt-2 text-xs text-accent hover:text-accent/80 transition-colors text-left">
+        <button
+          className="w-full mt-2 text-xs text-left transition-colors"
+          style={{ color: L.textAccent }}
+        >
           Enable RLS policies
         </button>
       </div>
@@ -417,7 +507,7 @@ function SchemaPanel({ table }: { table: string }) {
   )
 }
 
-// --- Main content area ---
+// --- Main content area (light) ---
 function MainContent({ activeTable }: { activeTable: string }) {
   const [running, setRunning] = useState(false)
   const [hasRun, setHasRun] = useState(true)
@@ -431,18 +521,22 @@ function MainContent({ activeTable }: { activeTable: string }) {
   }
 
   return (
-    <div className="flex-1 flex flex-col min-h-0 overflow-hidden bg-background">
+    <div className="flex-1 flex flex-col min-h-0 overflow-hidden" style={{ background: L.bg }}>
       {/* Sub nav */}
-      <div className="flex items-center gap-1 px-4 py-2 border-b border-border bg-card shrink-0">
+      <div
+        className="flex items-center gap-1 px-4 py-2 shrink-0"
+        style={{ background: L.bgCard, borderBottom: `1px solid ${L.border}` }}
+      >
         <div className="flex items-center gap-1 mr-4">
           {["Query", "Data", "Migrations", "Backups"].map((tab) => (
             <span
               key={tab}
-              className={`px-3 py-1.5 text-xs rounded-md cursor-default transition-colors ${
-                tab === "Query"
-                  ? "text-foreground bg-secondary"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
+              className="px-3 py-1.5 text-xs rounded-md cursor-default transition-colors"
+              style={{
+                color: tab === "Query" ? L.text : L.textSecondary,
+                background: tab === "Query" ? L.bgHover : "transparent",
+                fontWeight: tab === "Query" ? 500 : 400,
+              }}
             >
               {tab}
             </span>
@@ -450,11 +544,19 @@ function MainContent({ activeTable }: { activeTable: string }) {
         </div>
         <div className="flex-1" />
         <div className="relative hidden sm:block">
-          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
+          <Search
+            className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5"
+            style={{ color: L.textMuted }}
+          />
           <input
             type="text"
             placeholder="Search tables..."
-            className="w-44 h-8 pl-8 pr-3 rounded-md bg-secondary/50 border border-border text-xs placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-accent"
+            className="w-44 h-8 pl-8 pr-3 rounded-md text-xs focus:outline-none focus:ring-1"
+            style={{
+              background: L.bgSidebar,
+              border: `1px solid ${L.border}`,
+              color: L.text,
+            }}
           />
         </div>
       </div>
@@ -465,10 +567,10 @@ function MainContent({ activeTable }: { activeTable: string }) {
         {hasRun ? (
           <ResultsTable loading={running} />
         ) : (
-          <div className="flex-1 flex items-center justify-center">
-            <div className="flex flex-col items-center gap-2 text-muted-foreground">
-              <Play className="w-8 h-8" />
-              <p className="text-sm">Run a query to see results</p>
+          <div className="flex-1 flex items-center justify-center" style={{ background: L.bgCard }}>
+            <div className="flex flex-col items-center gap-2">
+              <Play className="w-8 h-8" style={{ color: L.textMuted }} />
+              <p className="text-sm" style={{ color: L.textMuted }}>Run a query to see results</p>
             </div>
           </div>
         )}
@@ -482,7 +584,7 @@ export function FakeWorkspace() {
   const [activeTable, setActiveTable] = useState("users")
 
   return (
-    <div className="fixed inset-0 flex flex-col bg-background overflow-hidden select-none">
+    <div className="fixed inset-0 flex flex-col overflow-hidden select-none" style={{ background: L.bg }}>
       <TopNav />
       <div className="flex flex-1 min-h-0">
         <StorageSidebar activeTable={activeTable} onTableSelect={setActiveTable} />

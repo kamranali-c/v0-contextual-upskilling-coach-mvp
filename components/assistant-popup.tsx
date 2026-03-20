@@ -770,11 +770,15 @@ export function AssistantPopup() {
     return (
       <button
         onClick={() => setOpen(true)}
-        className="fixed bottom-6 right-6 z-50 flex items-center gap-2 px-4 py-2.5 rounded-full bg-accent text-accent-foreground shadow-lg shadow-accent/20 hover:scale-105 transition-transform"
+        className="fixed bottom-6 right-6 z-50 flex items-center gap-2.5 pl-2.5 pr-4 py-2 rounded-full bg-popover border border-border shadow-2xl shadow-black/40 hover:scale-105 transition-transform"
       >
-        <Sparkles className="w-4 h-4" />
-        <span className="text-sm font-medium">FlowState</span>
-        <span className="text-xs opacity-80">OFF</span>
+        <img
+          src="/flowstate-logo.jpg"
+          alt=""
+          className="w-6 h-6 rounded-md object-cover"
+        />
+        <span className="text-sm font-medium text-foreground">FlowState</span>
+        <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">OFF</span>
       </button>
     )
   }
@@ -799,9 +803,11 @@ export function AssistantPopup() {
     >
       {/* Header */}
       <div className="flex items-center gap-2.5 px-4 py-3 border-b border-border shrink-0 bg-popover">
-        <div className="w-7 h-7 rounded-lg bg-accent/15 flex items-center justify-center">
-          <Sparkles className="w-3.5 h-3.5 text-accent" />
-        </div>
+        <img
+          src="/flowstate-logo.jpg"
+          alt="FlowState"
+          className="w-7 h-7 rounded-lg object-cover"
+        />
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
             <h3 className="text-sm font-medium text-foreground">FlowState</h3>
